@@ -1,0 +1,81 @@
+.form-visitante {
+    display: flex;
+    justify-content: space-between;
+}
+
+.form-wrapper {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    align-items: center;
+}
+
+.btn-file {
+    width: 100%;
+}
+
+.form-linha {
+    display: flex;
+    justify-content: space-between;
+}
+
+.campo {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: .5rem;
+}
+
+.width--18 {
+    width: 18%;
+}
+
+.width--31_5 {
+    width: 31.5%;
+}
+
+.width--33 {
+    width: 33%;
+}
+
+.width--35 {
+ width: 35%;
+}
+
+.width--63 {
+    width: 63%
+}
+
+.width--65 {
+    width: 65%;
+}
+
+.width--80 {
+    width: 80%
+}
+
+.width--95 {
+    width: 95%;
+}
+
+.width--100 {
+    width: 100%;
+}
+
+.form-check {
+    margin-right: 0.5rem;
+}
+
+.erro-cadastro{
+    align-self: center;
+}
+
+
+.acao {
+    display: flex;
+    justify-content: flex-end;
+    align-content: center;
+}
+
+.btn-acao {
+    margin: 0 0.2rem;
+}

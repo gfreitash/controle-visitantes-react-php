@@ -1,0 +1,40 @@
+body {
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
+main {
+    flex-grow: 1;
+    background-color: #dfdfdf;
+}
+
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.pge-bg-gray {
+    background-color: rgb(24, 26, 27);
+}
+
+.header-logo {
+    object-fit: scale-down;
+    height: 3.5rem;
+}
+
+.footer-text {
+    font-size: 10px;
+}
+
+.main-container {
+    background: #fff;
+    width: 85%;
+    margin: 1rem auto;
+    border: 1px solid #dee2e6;
+    border-radius: .375rem;
+    padding: 2rem;
+}
+
+a > svg {
+    color: black;
+} 
