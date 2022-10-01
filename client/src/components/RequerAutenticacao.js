@@ -17,7 +17,7 @@ export default function RequerAutenticacao() {
             const getAuth = async () => {
                 try {
                     const response = await axios.get("/refresh", {
-                        sinal: controller.signal,
+                        signal: controller.signal,
                         withCredentials: true
                     });
 
