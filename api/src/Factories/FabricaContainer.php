@@ -2,6 +2,8 @@
 
 namespace App\Visitantes\Factories;
 
+use App\Visitantes\Interfaces\RepositorioVisitante;
+use App\Visitantes\Repositories\RepositorioVisitantePDO;
 use DI\Container;
 use DI\ContainerBuilder;
 use Exception;
@@ -17,6 +19,9 @@ class FabricaContainer
         $construtor->addDefinitions([
             RepositorioUsuario::class => function () {
                 return RepositorioUsuarioPDO::obterRepositorioUsuario();
+            },
+            RepositorioVisitante::class => function () {
+                return RepositorioVisitantePDO::obterRepositorioVisitante();
             },
         ]);
         try {
