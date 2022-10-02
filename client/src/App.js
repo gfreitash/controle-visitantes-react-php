@@ -9,14 +9,18 @@ import {Routes, Route} from "react-router-dom";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Main from "./components/Main";
+import useAuth from "./hooks/useAuth";
+import NovoCadastro from "./pages/NovoCadastro";
 
 export default function App() {
+    const {auth} = useAuth();
+
     return (
         <div className="wrapper">
-            <Header usuario="Admin"/>
+            <Header usuario={auth?.nome}/>
             <Main>
                 <Routes>
-                    <Route path="/" />
+                    <Route path="/novo-cadastro" element={<NovoCadastro/>}/>
                 </Routes>
             </Main>
             <Footer/>

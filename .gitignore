@@ -31,3 +31,5 @@ test/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+/client/src/assets/imgs/logo.png
+/client/src/assets/imgs/logo-light.png

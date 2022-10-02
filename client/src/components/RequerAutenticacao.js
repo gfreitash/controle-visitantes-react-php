@@ -11,13 +11,11 @@ export default function RequerAutenticacao() {
     let recarregado = false;
 
     useEffect(() => {
-        const controller = new AbortController();
 
         if(!auth?.accessToken && !recarregado) {
             const getAuth = async () => {
                 try {
                     const response = await axios.get("/refresh", {
-                        signal: controller.signal,
                         withCredentials: true
                     });
 
@@ -36,7 +34,6 @@ export default function RequerAutenticacao() {
         }
         return () => {
             recarregado = true;
-            controller.abort();
         }
     }, []);
 
