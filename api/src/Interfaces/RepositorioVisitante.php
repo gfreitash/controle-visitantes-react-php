@@ -18,9 +18,9 @@ interface RepositorioVisitante
 
     public function buscarTodosVisitantes($ordenar_por=false, int $limit=0, int $offset=0): array;
 
-    public function buscarVisitantesComo($termo, $ordenar_por=false, int $limit=0, int $offset=0): array;
+    public function buscarVisitantesComo($termo, $ordenarPor=false, int $limit=0, int $offset=0): array;
 
-    public function obterTotalVisitantes(): int;
+    public function obterTotalVisitantes(string $como=""): int;
 
     public static function obterRepositorioVisitante(): RepositorioVisitante;
 

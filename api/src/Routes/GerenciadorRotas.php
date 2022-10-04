@@ -29,10 +29,9 @@ class GerenciadorRotas
             return $tipoToken === Rotas::AUTORIZACAO[0];
         }
 
-        trigger_error("Token encontrado");
         return match ($tipoToken) {
-            Rotas::AUTORIZACAO[1] => JwtHelper::decodeAccessToken($token)->exp > time(),
-            Rotas::AUTORIZACAO[2] => JwtHelper::decodeRefreshToken($token)->exp > time(),
+            Rotas::AUTORIZACAO[1] => JwtHelper::decodeAccessToken($token)?->exp > time(),
+            Rotas::AUTORIZACAO[2] => JwtHelper::decodeRefreshToken($token)?->exp > time(),
             default => false,
         };
     }

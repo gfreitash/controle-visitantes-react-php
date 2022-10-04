@@ -33,36 +33,36 @@ class ControladorVisitante extends ControladorRest
             }
             $resultado = $this->repositorioVisitante->buscarPorCpf($queries['cpf']);
         } else {
+            $pesquisa = $this->filtrarPesquisa($queries['pesquisa']);
             $ordenarPor = $queries['ordenar'] ?? 'nome';
-            $limite = $queries['limite'] ?? 30;
+            $limite = $queries['limite'] ?? null;
             $pagina = $queries['pagina'] ?? 1;
-            $ordem = $queries['ordem'] ?? 'DESC';
+            $ordem = $queries['ordem'] ?? 'ASC';
             $buscarPor = RepositorioVisitantePDO::BUSCAR_POR;
 
-
-            $offset = $pagina ? ($pagina - 1) * $limite : 0;
-            if (array_key_exists($ordenarPor, $buscarPor)) {
-                if (in_array($ordem, ['ASC', 'DESC'])) {
-                    $ordenar = [$ordenarPor => $ordem];
-                    array_shift($buscarPor);
-                    array_unshift($buscarPor, $ordenar);
-                } else {
-                    return new Response(
-                        400,
-                        $cabecalhoResposta,
-                        json_encode(['error' => 'Ordem inválida']));
-                }
+            $offset = ($pagina - 1) * $limite;
+            if (array_key_exists($ordenarPor, $buscarPor) && in_array(strtoupper($ordem), ['ASC', 'DESC'])) {
+                array_shift($buscarPor);
+                $buscarPor = [$ordenarPor => $ordem] + $buscarPor;
             } else {
                 return new Response(
                     400,
                     $cabecalhoResposta,
-                    json_encode(['error' => 'Tipo de ordenação inválida']));
+                    json_encode(['error' => 'Ordem ou tipo de ordenação inválida']));
             }
 
-            $quantidadeVisitantes = $this->repositorioVisitante->obterTotalVisitantes();
-            $quantidadePaginas = ceil($quantidadeVisitantes / $limite);
-            $resultado = $this->repositorioVisitante->buscarTodosVisitantes($buscarPor, $limite, $offset);
-
+            $quantidadeVisitantes = $this->repositorioVisitante->obterTotalVisitantes($pesquisa ?? '');
+            if ($limite) {
+                $resultado = $pesquisa
+                    ? $this->repositorioVisitante->buscarVisitantesComo($pesquisa, $buscarPor, $limite, $offset)
+                    : $this->repositorioVisitante->buscarTodosVisitantes($buscarPor, $limite, $offset);
+                $quantidadePaginas = ceil($quantidadeVisitantes / $limite);
+            } else {
+                $resultado = $pesquisa
+                    ? $this->repositorioVisitante->buscarVisitantesComo($pesquisa, $buscarPor)
+                    : $this->repositorioVisitante->buscarTodosVisitantes($buscarPor);
+                $quantidadePaginas = 1;
+            }
             $conteudoResposta = [
                 'quantidadeVisitantes' => $quantidadeVisitantes,
                 'quantidadePaginas' => $quantidadePaginas,
@@ -143,5 +143,10 @@ class ControladorVisitante extends ControladorRest
     public function delete(ServerRequestInterface $request): ResponseInterface
     {
         return new Response(501);
+    }
+
+    private function filtrarPesquisa(?string $pesquisa): string
+    {
+        return $pesquisa && $pesquisa !== '""' ? $pesquisa : '';
     }
 }

@@ -12,7 +12,6 @@ use App\Visitantes\Helpers\Utils;
 
 class RepositorioVisitantePDO extends DataLayer implements RepositorioVisitante
 {
-    private \PDO $conexao;
     public const BUSCAR_POR = [
         'nome' => 'ASC',
         'cpf' => 'ASC',
@@ -24,7 +23,6 @@ class RepositorioVisitantePDO extends DataLayer implements RepositorioVisitante
     public function __construct()
     {
         parent::__construct("tb_visitante", ["cpf", "nome"], "id", false);
-        $this->conexao = Conexao::criarConexao();
     }
 
     public function adicionarVisitante($visitante): bool|int
@@ -88,9 +86,34 @@ class RepositorioVisitantePDO extends DataLayer implements RepositorioVisitante
         return $this->destroy();
     }
 
-    public function buscarTodosVisitantes($ordenarPor=false, int $limit=0, int $offset=0): array
+    public function buscarTodosVisitantes($ordenar_por=false, int $limit=0, int $offset=0): array
     {
         $this->find();
+        if ($ordenar_por) {
+            $this->order($this->ordenarPor($ordenar_por));
+        }
+        if ($limit) {
+            $this->limit($limit);
+        }
+        if ($limit && $offset) {
+            $this->offset($offset);
+        }
+        $resultado = $this->fetch(true);
+        return $this->count() ? array_map(fn($rs) => $rs->data(), $resultado) : [];
+    }
+
+    public function buscarVisitantesComo($termo, $ordenarPor=false, int $limit=0, int $offset=0): array
+    {
+        if (DateTime::createFromFormat('d/m/Y', $termo)) {
+            $termo = Utils::formatarData($termo, Utils::FORMATOS_DATA['date_local'], Utils::FORMATOS_DATA['date']);
+            $where = "cadastrado_em LIKE :termo";
+            $this->find($where, "termo=$termo%");
+        } else {
+            $where = "cpf LIKE :cpf OR nome like :nome";
+            $termo .= "%";
+            $this->find($where, "cpf=$termo&nome=$termo");
+        }
+
         if ($ordenarPor) {
             $this->order($this->ordenarPor($ordenarPor));
         }
@@ -101,25 +124,8 @@ class RepositorioVisitantePDO extends DataLayer implements RepositorioVisitante
             $this->offset($offset);
         }
 
-        return $this->fetch(true);
-    }
-
-    public function buscarVisitantesComo($termo, $ordenar_por=false, int $limit=0, int $offset=0): array
-    {
-        $where = "cpf LIKE :cpf OR nome like :nome";
-        $termo .= "%";
-        $this->find($where, "cpf=$termo&nome=$termo");
-        if ($ordenar_por) {
-            $this->order($this->ordenarPor($ordenar_por));
-        }
-        if ($limit) {
-            $this->limit($limit);
-        }
-        if ($limit && $offset) {
-            $this->offset($offset);
-        }
-
-        return $this->fetch(true);
+        $resultado = $this->fetch(true);
+        return $this->count() ? array_map(fn($rs) => $rs->data(), $resultado) : [];
     }
 
     public function obterIdVisitante(string $cpf): int
@@ -179,11 +185,30 @@ class RepositorioVisitantePDO extends DataLayer implements RepositorioVisitante
         return new RepositorioVisitantePDO();
     }
 
-    public function obterTotalVisitantes(): int
+    public function obterTotalVisitantes(string $como = ""): int
     {
-        $query = "SELECT COUNT(*) FROM tb_visitante";
-        $stmt = $this->conexao->query($query);
+        $conexao = Conexao::criarConexao();
+        if ($como) {
+            if (DateTime::createFromFormat('d/m/Y', $como)) {
+                $como = Utils::formatarData($como, Utils::FORMATOS_DATA['date_local'], Utils::FORMATOS_DATA['date']);
+                $where = "cadastrado_em LIKE :como";
+                $query = "SELECT COUNT(*) FROM tb_visitante WHERE $where";
+                $stmt = $conexao->prepare($query);
+                $stmt->bindValue(":como", $como."%");
+            } else {
+                $como .= "%";
+                $where = "cpf LIKE :cpf OR nome LIKE :nome";
+                $query = "SELECT COUNT(*) FROM tb_visitante WHERE $where";
+                $stmt = $conexao->prepare($query);
+                $stmt->bindValue(":cpf", $como);
+                $stmt->bindValue(":nome", $como);
+            }
+        } else {
+            $query = "SELECT COUNT(*) FROM tb_visitante";
+            $stmt = $conexao->prepare($query);
+        }
 
-        return (int) $stmt->fetch();
+        $stmt->execute();
+        return (int) $stmt->fetch()["COUNT(*)"];
     }
 }

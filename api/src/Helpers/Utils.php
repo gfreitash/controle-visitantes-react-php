@@ -9,7 +9,8 @@ class Utils
     public const FORMATOS_DATA =
         ['datetime' => "Y-m-d H:i:s",
             'date' => "Y-m-d", 'web' => 'Y-m-d\TH:i:s',
-            'datetime_curto' => 'd/m/Y H:i'];
+            'datetime_local_curto' => 'd/m/Y H:i',
+            'date_local' => 'd/m/Y'];
 
 
     public static function obterHoraDataLocal(): DateTime
@@ -37,12 +38,15 @@ class Utils
         return $parte1.$parte2.$parte3.$parte4;
     }
 
-    public static function formatarData($data, string $formato): string
+    public static function formatarData($data, string $formatoEntrada, string $formatoSaida): string
     {
-        if ($data !== null && in_array($formato, self::FORMATOS_DATA, true)) {
-            $dt = DateTime::createFromFormat(self::FORMATOS_DATA['datetime'], $data);
+        if ($data !== null
+            && in_array($formatoEntrada, self::FORMATOS_DATA, true)
+            && in_array($formatoSaida, self::FORMATOS_DATA, true)) {
+
+            $dt = DateTime::createFromFormat($formatoEntrada, $data);
             if ($dt) {
-                return $dt->format(self::FORMATOS_DATA['datetime_curto']);
+                return $dt->format($formatoSaida);
             }
         }
 
