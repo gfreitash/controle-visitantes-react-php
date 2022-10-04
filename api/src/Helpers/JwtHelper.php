@@ -12,7 +12,7 @@ class JwtHelper
 {
     private const ALGORITMO = "HS256";
     private const TEMPO_VIDA_ACCESS_TOKEN = 60 * 3; // 3 minutos
-    private const TEMPO_VIDA_REFRESH_TOKEN = 60 * 60 * 24; // 1 dia
+    private const TEMPO_VIDA_REFRESH_TOKEN = 60 * 60 * 1.5; // 1 hora e meia
 
     public static function criarAccessToken(array $conteudo): ?string
     {
@@ -37,7 +37,6 @@ class JwtHelper
             $token = str_replace("Bearer ", "", $token);
             return JWT::decode($token, new Key($_ENV["ACCESS_TOKEN_KEY"], self::ALGORITMO));
         } catch (\Exception $e) {
-            trigger_error($e->getMessage());
             return null;
         }
     }
