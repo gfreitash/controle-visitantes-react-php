@@ -1,12 +1,16 @@
 import React, {useRef, useState} from "react";
+import {Link, useNavigate} from "react-router-dom";
+
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
+import useInvalidSessionHandler from "../hooks/useInvalidSessionHandler";
+import useAuth from "../hooks/useAuth";
+
+import "../assets/css/form-cadatro.css"
+import {validaCPF} from "../assets/js/modules/dados-visitante";
+
 import Titulo from "../components/Titulo";
 import FotoVisitante from "../components/FotoVisitante";
 import DadosVisitante from "../components/DadosVisitante";
-import {Link, useNavigate} from "react-router-dom";
-import useAxiosPrivate from "../hooks/useAxiosPrivate";
-import {validaCPF} from "../assets/js/modules/dados-visitante";
-import useInvalidSessionHandler from "../hooks/useInvalidSessionHandler";
-import useAuth from "../hooks/useAuth";
 
 export default function NovoCadastro() {
     const axios = useAxiosPrivate();

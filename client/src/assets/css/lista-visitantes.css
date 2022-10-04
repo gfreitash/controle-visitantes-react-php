@@ -1,0 +1,69 @@
+.conteudo {
+    display: flex;
+    flex-direction: column;
+    justify-self: center;
+    align-self: center;
+}
+
+.campo-pesquisa {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.campo-pesquisa__elemento {
+    margin: .2rem;
+}
+
+.navegacao {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+}
+
+.navegacao .btn {
+    margin-bottom: 1rem;
+}
+
+th {
+    align-items: center;
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
+}
+th:hover {
+    color: #aaa;
+    text-decoration: none;
+}
+
+th > svg {
+    color: white;
+    margin: 0 .2rem;
+}
+
+.icone-th {
+    cursor: auto;
+}
+
+.sem-resultado {
+    font-size: large;
+    font-weight: lighter;
+    font-style: italic;
+    text-align: center;
+}
+
+th:nth-child(1),
+td:nth-child(1) {
+    width: 8.5rem;
+    min-width: 8.5rem;
+}
+
+th:nth-child(3), th:nth-child(4), th:nth-child(5),
+td:nth-child(3), td:nth-child(4), td:nth-child(5) {
+    width: 6.5rem;
+}
+th:nth-child(6), th:nth-child(7),
+td:nth-child(6), td:nth-child(7) {
+    width: 2.5rem;
+    text-align: center;
+}

@@ -2,7 +2,6 @@ import React from "react";
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "./assets/css/style.css"
-import "./assets/css/form-cadatro.css"
 
 import {Routes, Route} from "react-router-dom";
 
@@ -11,6 +10,7 @@ import Footer from "./components/Footer";
 import Main from "./components/Main";
 import useAuth from "./hooks/useAuth";
 import NovoCadastro from "./pages/NovoCadastro";
+import ListaVisitantes from "./pages/ListaVisitantes";
 
 export default function App() {
     const {auth} = useAuth();
@@ -21,6 +21,7 @@ export default function App() {
             <Main>
                 <Routes>
                     <Route path="/novo-cadastro" element={<NovoCadastro/>}/>
+                    <Route path="/lista-visitantes" element={<ListaVisitantes/>}/>
                 </Routes>
             </Main>
             <Footer/>
