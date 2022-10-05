@@ -52,4 +52,12 @@ class Utils
 
         return "";
     }
+
+    public static function converterBinarioParaBase64($uploadBinario, $mime): string
+    {
+        if (!$uploadBinario || !$mime) {
+            return "";
+        }
+        return 'data:'.$mime.';base64,'.base64_encode($uploadBinario);
+    }
 }

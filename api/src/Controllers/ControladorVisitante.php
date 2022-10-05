@@ -110,7 +110,9 @@ class ControladorVisitante extends ControladorRest
         }
 
         $upload = $request->getUploadedFiles()['fotoInput'];
-        $foto = base64_encode($upload->getStream()->getContents()) ?? null;
+        $uploadBinario = $upload->getStream()->getContents() ?? null;
+        $mime = $upload->getClientMediaType() ?? null;
+        $foto = Utils::converterBinarioParaBase64($uploadBinario, $mime);
         $dataNascimento = \DateTime::createFromFormat(Utils::FORMATOS_DATA['date'], $dados['dataNascimento']) ?? null;
 
         $dadosVisitante = new DadosVisitante($dados['cpf'], $dados['nome']);
