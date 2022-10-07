@@ -29,13 +29,14 @@ class Visitante extends Entidade
 
     public function paraArray(): array
     {
-        $arr = $this->dadosVisitante->paraArray();
+        $arr = array();
+        $arr['id'] = $this->id;
         $arr['cadastrado_por'] = $this->cadastrado_por;
         $arr['modificado_por'] = $this->modificado_por;
         $arr['cadastrado_em'] = $this->cadastrado_em?->format($this->formatoData);
         $arr['modificado_em'] = $this->modificado_em?->format($this->formatoData);
 
-        return $arr;
+        return $arr + $this->dadosVisitante->paraArray();
     }
 
     /**

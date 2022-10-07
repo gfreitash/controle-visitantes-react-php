@@ -27,7 +27,6 @@ class RepositorioVisitantePDO extends DataLayer implements RepositorioVisitante
 
     public function adicionarVisitante($visitante): bool|int
     {
-        trigger_error(print_r($visitante, true));
         $arr = $visitante->paraArray();
         unset($arr['modificado_em'], $arr['modificado_por']);
 
@@ -64,20 +63,19 @@ class RepositorioVisitantePDO extends DataLayer implements RepositorioVisitante
         return false;
     }
 
-    public function alterarVisitante($visitante, $cpfAntigo=false): bool
+    public function alterarVisitante($visitante): bool
     {
         $arr = $visitante->paraArray();
-        if ($cpfAntigo) {
-            $cpf = DadosVisitante::validarCPF($cpfAntigo);
-        } else {
-            $cpf = $arr['cpf'];
+        $vs = $this->findById((int) $arr['id']);
+        if (!$vs) {
+            $vs = $this->find("cpf = :cpf", "cpf={$arr['id']}");
+        }
+        if (!$vs) {
+            return false;
         }
 
-        $this->buscarPorCpf($cpf);
-        $this->atribuirPropriedades($arr);
-        $this->cpf = $cpfAntigo ? $arr['cpf'] : $cpf;
-
-        return $this->save();
+        $vs->atribuirPropriedades($arr);
+        return $vs->save();
     }
 
     public function removerVisitantePorCPF(string $cpf): bool

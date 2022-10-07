@@ -37,3 +37,6 @@ const DATA_LAYER_CONFIG = [
 
 /** diretório onde as fotos de visitantes são salvas */
 const DIR_FOTOS = '/assets/imgs/fotos/';
+
+//Definindo o timezone padrão
+date_default_timezone_set('America/Sao_Paulo');

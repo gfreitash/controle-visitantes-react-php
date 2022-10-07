@@ -6,107 +6,65 @@ use App\Visitantes\Helpers\Utils;
 use App\Visitantes\Interfaces\ControladorRest;
 use App\Visitantes\Interfaces\RepositorioVisitante;
 use App\Visitantes\Models\DadosVisitante;
+use App\Visitantes\Models\RespostaJson;
 use App\Visitantes\Models\Visitante;
 use App\Visitantes\Repositories\RepositorioVisitantePDO;
-use Nyholm\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class ControladorVisitante extends ControladorRest
 {
+    private array $ERROS = [
+        'Visitante não encontrado',
+        'ID do usuário não informado',
+        'Dados incompletos',
+        'CPF inválido',
+        'Já existe um visitante cadastrado com esse CPF',
+        'Já existe outro visitante cadastrado com esse CPF',
+        'Ordem ou tipo de ordenação inválida'
+        ];
 
     public function __construct(private readonly RepositorioVisitante $repositorioVisitante)
-    {}
+    {
+        parent::__construct();
+    }
 
     public function get(ServerRequestInterface $request): ResponseInterface
     {
-        $cabecalhoResposta = ['Content-Type' => 'application/json'];
         $queries=$request->getQueryParams();
+
         if (!empty($queries['id'])) {
-            $resultado = $this->repositorioVisitante->buscarPorId($queries['id']);
+            $resultado = $this->obterVisitantePorId($queries['id']);
         } elseif (!empty($queries['cpf'])) {
-            if (!DadosVisitante::validarCPF($queries['cpf'])) {
-                return new Response(
-                    400,
-                    $cabecalhoResposta,
-                    json_encode(['error' => 'CPF inválido']));
+            $resultado = $this->obterVisitantePorCpf($queries['cpf']);
+            if ($resultado instanceof RespostaJson) {
+                return $resultado;
             }
-            $resultado = $this->repositorioVisitante->buscarPorCpf($queries['cpf']);
         } else {
-            $pesquisa = $this->filtrarPesquisa($queries['pesquisa']);
-            $ordenarPor = $queries['ordenar'] ?? 'nome';
-            $limite = $queries['limite'] ?? null;
-            $pagina = $queries['pagina'] ?? 1;
-            $ordem = $queries['ordem'] ?? 'ASC';
-            $buscarPor = RepositorioVisitantePDO::BUSCAR_POR;
-
-            $offset = ($pagina - 1) * $limite;
-            if (array_key_exists($ordenarPor, $buscarPor) && in_array(strtoupper($ordem), ['ASC', 'DESC'])) {
-                array_shift($buscarPor);
-                $buscarPor = [$ordenarPor => $ordem] + $buscarPor;
-            } else {
-                return new Response(
-                    400,
-                    $cabecalhoResposta,
-                    json_encode(['error' => 'Ordem ou tipo de ordenação inválida']));
-            }
-
-            $quantidadeVisitantes = $this->repositorioVisitante->obterTotalVisitantes($pesquisa ?? '');
-            if ($limite) {
-                $resultado = $pesquisa
-                    ? $this->repositorioVisitante->buscarVisitantesComo($pesquisa, $buscarPor, $limite, $offset)
-                    : $this->repositorioVisitante->buscarTodosVisitantes($buscarPor, $limite, $offset);
-                $quantidadePaginas = ceil($quantidadeVisitantes / $limite);
-            } else {
-                $resultado = $pesquisa
-                    ? $this->repositorioVisitante->buscarVisitantesComo($pesquisa, $buscarPor)
-                    : $this->repositorioVisitante->buscarTodosVisitantes($buscarPor);
-                $quantidadePaginas = 1;
-            }
-            $conteudoResposta = [
-                'quantidadeVisitantes' => $quantidadeVisitantes,
-                'quantidadePaginas' => $quantidadePaginas,
-                'paginaAtual' => $pagina,
-                'visitantes' => $resultado
-            ];
-
-            return new Response(
-                200,
-                $cabecalhoResposta,
-                json_encode($conteudoResposta));
+            return $this->obterTodosVisitantes($queries);
         }
 
         if (!$resultado) {
-            return new Response(404, $cabecalhoResposta, json_encode(['error' => 'Visitante não encontrado']));
+            return new RespostaJson(404, json_encode(['error' => $this->ERROS[0]]));
         }
 
-        return new Response(200, $cabecalhoResposta, json_encode($resultado));
+        return new RespostaJson(200, json_encode($resultado));
     }
 
     public function post(ServerRequestInterface $request): ResponseInterface
     {
-        $cabecalhoResposta = ['Content-Type' => 'application/json'];
         $dados = $request->getParsedBody();
 
         if (empty($dados['idUsuario'])) {
-            return new Response(
-                403,
-                $cabecalhoResposta,
-                json_encode(['error' => 'ID do usuário não informado']));
+            return new RespostaJson(403, json_encode(['error' => $this->ERROS[1]]));
         }
 
         if (empty($dados['nome']) || empty($dados['cpf'])) {
-            return new Response(
-                400,
-                $cabecalhoResposta,
-                json_encode(['error' => 'Dados incompletos']));
+            return new RespostaJson(400, json_encode(['error' => $this->ERROS[2]]));
         }
 
         if (!DadosVisitante::validarCPF($dados['cpf'])) {
-            return new Response(
-                400,
-                $cabecalhoResposta,
-                json_encode(['error' => 'CPF inválido']));
+            return new RespostaJson(400, json_encode(['error' => $this->ERROS[3]]));
         }
 
         $upload = $request->getUploadedFiles()['fotoInput'];
@@ -127,28 +85,140 @@ class ControladorVisitante extends ControladorRest
 
         $resultado = $this->repositorioVisitante->adicionarVisitante($visitante);
         if (!$resultado) {
-            return new Response(
-                409,
-                $cabecalhoResposta,
-                json_encode(['error' => 'Já existe um visitante cadastrado com esse CPF']));
+            return new RespostaJson(409, json_encode(['error' => $this->ERROS[4]]));
         }
 
         $resultado = $this->repositorioVisitante->buscarPorId($resultado);
-        return new Response(201, $cabecalhoResposta, json_encode($resultado));
+        return new RespostaJson(201, json_encode($resultado));
     }
 
     public function put(ServerRequestInterface $request): ResponseInterface
     {
-        return new Response(501);
+        global $_PUT;
+        $dados = $_PUT;
+
+        if (empty($dados['idUsuario'])) {
+            return new RespostaJson(403, json_encode(['error' => $this->ERROS[1]]));
+        }
+        if (empty($dados['nome']) || empty($dados['cpf'])) {
+            return new RespostaJson(400, json_encode(['error' => $this->ERROS[2]]));
+        }
+        if (!DadosVisitante::validarCPF($dados['cpf'])) {
+            return new RespostaJson(400, json_encode(['error' => $this->ERROS[3]]));
+        }
+
+        if ($dados['id']) {
+            $visitante = $this->repositorioVisitante->buscarPorId($dados['id']);
+        } else {
+            $visitante = $this->repositorioVisitante->buscarPorCpf($dados['cpf']);
+        }
+
+        if (!$visitante) {
+            return new RespostaJson(404, json_encode(['error' => $this->ERROS[0]]));
+        }
+
+        $upload = $request->getUploadedFiles()['fotoInput'];
+        if ($upload) {
+            $uploadBinario = $upload->getStream()->getContents() ?? null;
+            $mime = $upload->getClientMediaType() ?? null;
+            $foto = Utils::converterBinarioParaBase64($uploadBinario, $mime);
+        } elseif ($dados['excluirFoto'] !== "false") {
+            $foto = "";
+        } else {
+            $foto = $visitante->getDadosVisitante()->getFoto();
+        }
+
+        $dataNascimento = \DateTime::createFromFormat(Utils::FORMATOS_DATA['date'], $dados['dataNascimento']) ?? null;
+
+        $dadosVisitante = $visitante->getDadosVisitante();
+        $dadosVisitante->setCpf($dados['cpf']);
+        $dadosVisitante->setNome($dados['nome']);
+        $dadosVisitante->setIdentidade($dados['identidade'] ?? null);
+        $dadosVisitante->setExpedidor($dados['expedidor'] ?? null);
+        $dadosVisitante->setFoto($foto);
+        $dadosVisitante->setDataNascimento($dataNascimento);
+
+        $visitante->setDadosVisitante($dadosVisitante);
+        $visitante->setModificadoEm(new \DateTime());
+        $visitante->setModificadoPor($dados['idUsuario']);
+
+        $resultado = $this->repositorioVisitante->alterarVisitante($visitante);
+        if (!$resultado) {
+            return new RespostaJson(409, json_encode(['error' => $this->ERROS[6]]));
+        }
+
+        return new RespostaJson(200, json_encode($visitante));
     }
 
     public function delete(ServerRequestInterface $request): ResponseInterface
     {
-        return new Response(501);
+        return $this->_501;
     }
 
     private function filtrarPesquisa(?string $pesquisa): string
     {
         return $pesquisa && $pesquisa !== '""' ? $pesquisa : '';
+    }
+
+    private function obterVisitantePorId(string $id): bool|Visitante
+    {
+        $resultado = $this->repositorioVisitante->buscarPorId($id);
+        if ($resultado) {
+            $resultado->setFormatoData(Utils::FORMATOS_DATA['web']);
+            $resultado->getDadosVisitante()->setFormatoData(Utils::FORMATOS_DATA['date']);
+        }
+        return $resultado;
+    }
+
+    private function obterVisitantePorCpf(string $cpf): bool|RespostaJson|Visitante
+    {
+        if (!DadosVisitante::validarCPF($cpf)) {
+            return new RespostaJson(400, json_encode(['error' => $this->ERROS[3]]));
+        }
+        $resultado = $this->repositorioVisitante->buscarPorCpf($cpf);
+        if ($resultado) {
+            $resultado->setFormatoData(Utils::FORMATOS_DATA['web']);
+            $resultado->getDadosVisitante()->setFormatoData(Utils::FORMATOS_DATA['date']);
+        }
+        return $resultado;
+    }
+
+    private function obterTodosVisitantes(array $queries): RespostaJson
+    {
+        $pesquisa = $this->filtrarPesquisa($queries['pesquisa']);
+        $ordenarPor = $queries['ordenar'] ?? 'nome';
+        $limite = $queries['limite'] ?? null;
+        $pagina = $queries['pagina'] ?? 1;
+        $ordem = $queries['ordem'] ?? 'ASC';
+        $buscarPor = RepositorioVisitantePDO::BUSCAR_POR;
+
+        $offset = ($pagina - 1) * $limite;
+        if (array_key_exists($ordenarPor, $buscarPor) && in_array(strtoupper($ordem), ['ASC', 'DESC'])) {
+            array_shift($buscarPor);
+            $buscarPor = [$ordenarPor => $ordem] + $buscarPor;
+        } else {
+            return new RespostaJson(400, json_encode(['error' => $this->ERROS[6]]));
+        }
+
+        $quantidadeVisitantes = $this->repositorioVisitante->obterTotalVisitantes($pesquisa ?? '');
+        if ($limite) {
+            $resultado = $pesquisa
+                ? $this->repositorioVisitante->buscarVisitantesComo($pesquisa, $buscarPor, $limite, $offset)
+                : $this->repositorioVisitante->buscarTodosVisitantes($buscarPor, $limite, $offset);
+            $quantidadePaginas = ceil($quantidadeVisitantes / $limite);
+        } else {
+            $resultado = $pesquisa
+                ? $this->repositorioVisitante->buscarVisitantesComo($pesquisa, $buscarPor)
+                : $this->repositorioVisitante->buscarTodosVisitantes($buscarPor);
+            $quantidadePaginas = 1;
+        }
+        $conteudoResposta = [
+            'quantidadeVisitantes' => $quantidadeVisitantes,
+            'quantidadePaginas' => $quantidadePaginas,
+            'paginaAtual' => $pagina,
+            'visitantes' => $resultado
+        ];
+
+        return new RespostaJson(200, json_encode($conteudoResposta));
     }
 }

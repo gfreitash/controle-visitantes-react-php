@@ -12,7 +12,7 @@ interface RepositorioVisitante
 
     public function buscarPorId(string $id): bool|Visitante;
 
-    public function alterarVisitante(Visitante $visitante, $cpf_antigo=false): bool;
+    public function alterarVisitante(Visitante $visitante): bool;
 
     public function removerVisitantePorCPF(string $cpf): bool;
 
