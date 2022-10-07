@@ -11,6 +11,7 @@ import Main from "./components/Main";
 import useAuth from "./hooks/useAuth";
 import NovoCadastro from "./pages/NovoCadastro";
 import ListaVisitantes from "./pages/ListaVisitantes";
+import Visitante from "./pages/Visitante";
 
 export default function App() {
     const {auth} = useAuth();
@@ -22,6 +23,7 @@ export default function App() {
                 <Routes>
                     <Route path="/novo-cadastro" element={<NovoCadastro/>}/>
                     <Route path="/lista-visitantes" element={<ListaVisitantes/>}/>
+                    <Route path="/visitante" element={<Visitante/>}/>
                 </Routes>
             </Main>
             <Footer/>

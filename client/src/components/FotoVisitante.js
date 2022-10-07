@@ -1,4 +1,4 @@
-import React, {useRef} from "react";
+import React, {useEffect, useRef, useState} from "react";
 
 import "../assets/css/foto-visitante.css";
 
@@ -11,14 +11,19 @@ export default function FotoVisitante(props) {
     const inputFotoRef = useRef();
     const fotoClienteRef = useRef();
 
-    const [excluirFoto, setExcluirFoto] = React.useState(false);
-    const [foto, setFoto] = React.useState(props.foto);
+    const [excluirFoto, setExcluirFoto] = useState(false);
+    const [foto, setFoto] = useState(props.foto ? props.foto : foto_padrao);
 
-    function removerImagem() {
-        fotoClienteRef.current.src = foto_padrao;
-        inputFotoRef.current.value = '';
-        if (props.foto && props.foto !== foto) {
+    function removerImagem(estrito = true) {
+        if (props.foto === foto && estrito) {
             setExcluirFoto(true);
+        }
+        if(estrito) {
+            fotoClienteRef.current.src = foto_padrao;
+            setFoto(foto_padrao);
+        }
+        if(inputFotoRef.current) {
+            inputFotoRef.current.value = "";
         }
     }
 
@@ -38,13 +43,13 @@ export default function FotoVisitante(props) {
         let extensoesPermitidas = /(\.jpg|\.jpeg|\.png|\.webp)$/
         if(!extensoesPermitidas.exec(inputFoto?.value)) {
             alert("Os formatos permitidos de arquivo são apenas .jpg, .jpeg, .png e .webp");
-            removerImagem();
+            removerImagem(false);
             return;
         }
         let tamanhoMaximo = 2*1024*1024; // 2MB
         if(arquivo.size > tamanhoMaximo) {
             alert("O arquivo deve ter menos de 2MB");
-            removerImagem();
+            removerImagem(false);
             return;
         }
         let base64 = await paraBase64(arquivo);
@@ -55,11 +60,20 @@ export default function FotoVisitante(props) {
         removerImagem();
     }
 
+    useEffect(() => {
+        setFoto(props.foto ? props.foto : foto_padrao);
+    },[props.foto]);
+
+    useEffect(() => {
+        setFoto(props.foto ? props.foto : foto_padrao);
+        setExcluirFoto(false);
+    },[props.editavel]);
+
     return (
         <div className="form-foto" id="form-foto">
             <div className="foto-preview" id="foto-preview">
-                <img alt="Foto do cliente" className="foto-cliente" src={foto ?? foto_padrao}
-                     height="190px" width="100%" id="fotoCliente" ref={fotoClienteRef}/>
+                <img alt="Foto do cliente" className="foto-cliente" src={foto}
+                     height="190px" width="100%" id="fotoCliente" ref={fotoClienteRef} key={foto}/>
             </div>
 
             <input type="hidden" name="excluirFoto" id="excluirFoto" value={excluirFoto.toString()}/>

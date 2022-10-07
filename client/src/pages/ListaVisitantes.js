@@ -64,7 +64,7 @@ export default function ListaVisitantes() {
 
         let novaPesquisa = event.target.pesquisa.value === "" ? '""' : event.target.pesquisa.value;
         let navegarPara = `${URL_PAGINA}?pesquisa=${novaPesquisa}&ordenar=${ordenar}&ordem=${ordem}&pagina=1`;
-        console.log(novaPesquisa);
+
         setPagina(1);
         setPesquisa(novaPesquisa);
         pesquisaRef.current.value = novaPesquisa !== '""' ? novaPesquisa : "";

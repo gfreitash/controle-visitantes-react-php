@@ -43,13 +43,14 @@ export default function NovoCadastro() {
     async function handleSubmit(event) {
         event.preventDefault();
         if(!validaCPF(event.target.cpf, ()=>{})) {
-            alert("CPF inválido");
             return;
         }
+
         try {
             const formData = new FormData(event.target);
             formData.append("idUsuario", auth.id);
             const response = await axios.post("/visitante", formData);
+
             if (response.status === 201 || response.status === 200) {
                 const cpf = response.data.cpf;
                 navigate(`/visitante?cpf=${cpf}`);
@@ -91,7 +92,7 @@ export default function NovoCadastro() {
                         <div className="width--95">
                             <DadosVisitante estado={!buscaRealizada || visitanteEncontrado ? "disabled" : ""}
                                             cpfAutoFocus placeholder={placeholder}
-                                            onCpfValido={onCpfValido}/>
+                                            onCpfValido={onCpfValido} buscarDados={true}/>
                         </div>
                     </div>
                 </section>

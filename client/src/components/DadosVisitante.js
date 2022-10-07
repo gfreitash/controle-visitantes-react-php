@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {Form} from "react-bootstrap";
 
 import * as Funcoes from "../assets/js/modules/dados-visitante"
@@ -17,20 +17,13 @@ export default function DadosVisitante(props) {
     });
 
     const cpfAutoFocus = props.cpfAutoFocus ? props.cpfAutoFocus : false;
+    const cpfRef = useRef();
     const [disabled, setDisabled] = useState(props.estado?.toLowerCase() === "disabled");
     const [readOnly, setReadOnly] = useState(props.estado?.toLowerCase() === "readonly");
     const [cpfDisabled, setCpfDisabled] = useState(props.estadoCpf?.toLowerCase() === "disabled");
     const [cpfReadOnly, setCpfReadOnly] = useState(props.estadoCpf?.toLowerCase() === "readonly");
 
     const [placeholder] = useState(props.placeholder);
-
-
-    useEffect(() => {
-        setCpfDisabled(props.estadoCpf?.toLowerCase() === "disabled");
-        setCpfReadOnly(props.estadoCpf?.toLowerCase() === "readonly");
-        setDisabled(props.estado?.toLowerCase() === "disabled");
-        setReadOnly(props.estado?.toLowerCase() === "readonly");
-    });
 
     function handleChange(event) {
         const {name, value} = event.target;
@@ -47,28 +40,33 @@ export default function DadosVisitante(props) {
             cpf.value=Funcoes.mascaraCPF(cpf.value);
             if(cpf.value.length === 14) Funcoes.validaCPF(cpf, onCpfValido);
         }, 1);
+
         setFormData({...formData, cpf: cpf.value});
+    }
+
+    function preencherCampos() {
+        let onCpfValido = setOnCpfValido(cpfRef.current);
+        Funcoes.validaCPF(cpfRef.current, onCpfValido);
     }
 
     function setOnCpfValido(cpf) {
         let onCpfValido = ()=>{}
 
-        if(props.onCpfValido) {
+        if(props.onCpfValido && props.buscarDados) {
             let codigoResposta;
+
             onCpfValido = async () => {
                 try {
                     const response = await axiosPrivate.get(`/visitante?cpf=${cpf.value}`);
                     if(response.data) {
                         const visitante = response.data;
-                        setFormData(prev => {
-                            return {
-                                ...prev,
-                                nome: visitante.nome,
-                                dataNascimento: visitante.dataNascimento ?? "",
-                                identidade: visitante.identidade ?? "",
-                                expedidor: visitante.expedidor ?? ""
-                            }
+                        setFormData({cpf: cpf.value,
+                            nome: visitante.nome,
+                            dataNascimento: visitante.data_nascimento ?? "",
+                            identidade: visitante.identidade ?? "",
+                            expedidor: visitante.expedidor ?? ""
                         });
+
                         codigoResposta = response.status;
                         props.onCpfValido(codigoResposta, visitante);
                     }
@@ -82,14 +80,11 @@ export default function DadosVisitante(props) {
                         cpf.classList.add("is-invalid");
                     }
 
-                    setFormData(prev => {
-                        return {
-                            ...prev,
-                            nome: "",
-                            dataNascimento: "",
-                            identidade: "",
-                            expedidor: ""
-                        }
+                    setFormData({cpf: cpf.value,
+                        nome: "",
+                        dataNascimento: "",
+                        identidade: "",
+                        expedidor: ""
                     });
                 }
             }
@@ -97,20 +92,51 @@ export default function DadosVisitante(props) {
         return onCpfValido;
     }
 
+    useEffect(() => {
+        setCpfDisabled(props.estadoCpf?.toLowerCase() === "disabled");
+        setCpfReadOnly(props.estadoCpf?.toLowerCase() === "readonly");
+        setDisabled(props.estado?.toLowerCase() === "disabled");
+        setReadOnly(props.estado?.toLowerCase() === "readonly");
+    });
+
+    useEffect(() => {
+        if(props.onCpfValido && props.cpf && Funcoes.cpfValido(props.cpf)) {
+            setFormData({...formData, cpf: Funcoes.mascaraCPF(props.cpf)});
+        }
+    },[]);
+
+    useEffect(() => {
+        if (disabled || readOnly ) {
+            if (formData.cpf !== Funcoes.mascaraCPF(props.cpf)) {
+                setFormData({...formData, cpf: Funcoes.mascaraCPF(props.cpf)});
+            }
+            preencherCampos();
+        }
+    },[disabled, readOnly]);
+
+    useEffect(() => {
+        preencherCampos();
+        cpfRef.current?.classList.remove("is-invalid");
+    },[formData.cpf]);
+
+    useEffect(() => {
+        console.log(placeholder);
+    },[placeholder]);
+
     return (
         <>
             <div className="form-linha">
                 <Form.Group controlId="cpf" className="campo width--33 position-relative">
                     <Form.Label>CPF:</Form.Label>
-                    <Form.Control type="text" name="cpf" required autoFocus={cpfAutoFocus} readOnly={cpfReadOnly} disabled={cpfDisabled}
-                                  value={formData.cpf} placeholder={placeholder.cpf ?? ""} onChange={handleCpfChange}/>
+                    <Form.Control ref={cpfRef} type="text" name="cpf" required autoFocus={cpfAutoFocus} readOnly={cpfReadOnly} disabled={cpfDisabled}
+                                  value={formData.cpf} placeholder={placeholder?.cpf ?? ""} onChange={handleCpfChange}/>
                     <div className="invalid-tooltip">CPF não é valido</div>
                 </Form.Group>
 
                 <Form.Group controlId="nome" className="campo width--65 position-relative">
                     <Form.Label>Nome:</Form.Label>
                     <Form.Control type="text" name="nome" required readOnly={readOnly} disabled={disabled}
-                                  value={formData.nome} placeholder={placeholder.nome ?? ""} onChange={handleChange}/>
+                                  value={formData.nome} placeholder={placeholder?.nome ?? ""} onChange={handleChange}/>
                     <div className="invalid-tooltip">Nome não pode estar vazio</div>
                 </Form.Group>
             </div>
@@ -119,19 +145,19 @@ export default function DadosVisitante(props) {
                 <Form.Group controlId="dataNascimento" className="campo width--35">
                     <Form.Label>Data de Nascimento:</Form.Label>
                     <Form.Control type="date" name="dataNascimento" readOnly={readOnly} disabled={disabled}
-                                  value={formData.dataNascimento} placeholder={placeholder.dataNascimento ?? ""} onChange={handleChange}/>
+                                  value={formData.dataNascimento} placeholder={placeholder?.dataNascimento ?? ""} onChange={handleChange}/>
                 </Form.Group>
 
                 <div className="form-linha width--63">
                     <Form.Group controlId="identidade" className="campo width--65">
                         <Form.Label>RG/CNH:</Form.Label>
                         <Form.Control type="text" name="identidade" readOnly={readOnly} disabled={disabled}
-                                      value={formData.identidade} placeholder={placeholder.identidade ?? ""} onChange={handleChange}/>
+                                      value={formData.identidade} placeholder={placeholder?.identidade ?? ""} onChange={handleChange}/>
                     </Form.Group>
                     <Form.Group controlId="expedidor" className="campo width--33">
                         <Form.Label>Expedidor:</Form.Label>
                         <Form.Control type="text" name="expedidor" readOnly={readOnly} disabled={disabled}
-                                      value={formData.expedidor} placeholder={placeholder.expedidor ?? ""} onChange={handleChange}/>
+                                      value={formData.expedidor} placeholder={placeholder?.expedidor ?? ""} onChange={handleChange}/>
                     </Form.Group>
                 </div>
             </div>

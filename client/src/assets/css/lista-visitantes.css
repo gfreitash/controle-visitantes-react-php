@@ -41,6 +41,10 @@ th > svg {
     margin: 0 .2rem;
 }
 
+td > a > svg {
+    color: black;
+}
+
 .icone-th {
     cursor: auto;
 }
