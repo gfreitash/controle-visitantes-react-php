@@ -16,7 +16,7 @@ export default function Login() {
 
     const navigate = useNavigate();
     const location = useLocation();
-    const from = location.state?.from?.pathname || "/";
+    const from = location.state?.from?.pathname + location.state?.from?.search  || "/";
 
     const emailRef = useRef();
     const alertaRef = useRef();
