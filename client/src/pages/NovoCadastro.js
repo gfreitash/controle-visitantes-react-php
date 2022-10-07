@@ -24,14 +24,14 @@ export default function NovoCadastro() {
     const [buscaRealizada, setBuscaRealizada] = useState(false);
     const [alerta, setAlerta] = useState({tipo: "", mensagem: ""});
 
-    const onCpfValido = (codigoResposta) => {
-        setVisitanteEncontrado(codigoResposta === 200);
+    const onCpfValido = (codigoResposta, visitante) => {
+        setVisitanteEncontrado(visitante);
         setBuscaRealizada(true);
         setAlerta({tipo:"", mensagem: ""});
     };
 
     const editarVisitante = (
-        <Link to="/visitante?cpf=">
+        <Link to={`/visitante?cpf=${visitanteEncontrado.cpf}`}>
             <button type="button" id="botao-3" className="btn btn-success btn-acao btn-sm">
                 Detalhes
             </button>
