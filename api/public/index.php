@@ -1,6 +1,7 @@
 <?php
 
 use App\Visitantes\Factories\FabricaRequest;
+use App\Visitantes\Helpers\Utils;
 use App\Visitantes\Routes\GerenciadorRotas;
 use App\Visitantes\Routes\Rotas;
 
@@ -16,7 +17,7 @@ if (!empty($_SERVER['HTTP_ORIGIN'])) {
 
     http_response_code(200);
     header("Access-Control-Allow-Origin: $origem"); //Origem permitida
-    header("Access-Control-Allow-Headers: Authorization"); //Cabeçalhos permitidos
+    header("Access-Control-Allow-Headers: Authorization, Content-Type"); //Cabeçalhos permitidos
     header("Access-Control-Allow-Credentials: true"); //Credenciais são permitidas
     header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS"); //Métodos permitidos
     header("Access-Control-Max-Age: $maxAge"); //Tempo de cache
@@ -24,6 +25,9 @@ if (!empty($_SERVER['HTTP_ORIGIN'])) {
     if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
         exit(0);
     }
+}
+if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
+    Utils::parsePut();
 }
 
 
