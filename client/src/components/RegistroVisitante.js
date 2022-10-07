@@ -67,12 +67,12 @@ export default function RegistroVisitante(props) {
     return (
         <div className="form-linha">
             <div className="registro__grupo width--47_5">
-                <Form.Group controlId="cadastradoPor" className="registro__campo">
+                <Form.Group controlId="cadastradoPor" className="campo">
                     <Form.Label>Visitante registrado por:</Form.Label>
                     <Form.Control className="form-control-sm" disabled type="text" name="cadastradoPor"
                                   value={formData.cadastradoPor}/>
                 </Form.Group>
-                <Form.Group controlId="cadastradoEm" className="registro__campo">
+                <Form.Group controlId="cadastradoEm" className="campo">
                     <Form.Label>Data do cadastro:</Form.Label>
                     <Form.Control className="form-control-sm" disabled type="datetime-local" name="cadastradoEm"
                                   value={formData.cadastradoEm}/>
@@ -80,12 +80,12 @@ export default function RegistroVisitante(props) {
             </div>
 
             <div className="registro__grupo width--47_5">
-                <Form.Group controlId="modificadoPor" className="registro__campo">
+                <Form.Group controlId="modificadoPor" className="campo">
                     <Form.Label>Última modificação por:</Form.Label>
                     <Form.Control className="form-control-sm" disabled type="text" name="modificadoPor"
                                   value={formData.modificadoPor}/>
                 </Form.Group>
-                <Form.Group controlId="modificadoEm" className="registro__campo">
+                <Form.Group controlId="modificadoEm" className="campo">
                     <Form.Label>Última modificação em:</Form.Label>
                     <Form.Control className="form-control-sm" disabled type="datetime-local" name="modificadoEm"
                                   value={formData.modificadoEm}/>

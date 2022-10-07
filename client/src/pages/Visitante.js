@@ -19,12 +19,6 @@ export default function Visitante() {
     const axios = useAxiosPrivate();
     const {auth} = useAuth();
     const handleInvalidSession = useInvalidSessionHandler();
-    const placeholder = {
-        cpf: "Informe o CPF",
-        nome: "Informe o nome",
-        identidade: "Informe o número do documento de identidade",
-        expedidor: "Informe o órgão expedidor"
-    }
 
     const [cpf, setCpf] = useState(query.get("cpf") ?? "");
 
@@ -124,7 +118,7 @@ export default function Visitante() {
                 <div className="form-wrapper">
                     <div className="width--95">
                         <DadosVisitante estado={!editavel ? "disabled" : ""} estadoCpf={!editavel ? "disabled" : ""}
-                                        cpf={cpf} onCpfValido={onCpfValido} buscarDados={!editavel} placeholder={placeholder}/>
+                                        cpf={cpf} onCpfValido={onCpfValido} buscarDados={!editavel}/>
                         <hr className="hr--margin-top"/>
                         <RegistroVisitante
                             cadastradoPor={resultadoBusca?.cadastrado_por}

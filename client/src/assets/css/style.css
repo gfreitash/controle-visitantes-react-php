@@ -85,6 +85,12 @@ a > svg {
     width: 100%;
 }
 
+.campo {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: .5rem;
+}
+
 .hr--margin-top {
     margin-top: 2.5rem;
 }

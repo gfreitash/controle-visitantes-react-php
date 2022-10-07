@@ -23,7 +23,6 @@ export default function NovoCadastro() {
     const [visitanteEncontrado, setVisitanteEncontrado] = useState({});
     const [buscaRealizada, setBuscaRealizada] = useState(false);
     const [alerta, setAlerta] = useState({tipo: "", mensagem: ""});
-    const placeholder = {cpf: "Insira o cpf"}
 
     const onCpfValido = (codigoResposta) => {
         setVisitanteEncontrado(codigoResposta === 200);
@@ -91,8 +90,7 @@ export default function NovoCadastro() {
                     <div className="form-wrapper">
                         <div className="width--95">
                             <DadosVisitante estado={!buscaRealizada || visitanteEncontrado ? "disabled" : ""}
-                                            cpfAutoFocus placeholder={placeholder}
-                                            onCpfValido={onCpfValido} buscarDados={true}/>
+                                            cpfAutoFocus onCpfValido={onCpfValido} buscarDados={true}/>
                         </div>
                     </div>
                 </section>

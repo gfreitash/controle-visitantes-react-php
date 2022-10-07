@@ -1,9 +1,3 @@
-.registro__campo {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: .5rem;
-}
-
 .registro__grupo {
     display: flex;
     flex-direction: column;
