@@ -5,6 +5,7 @@ import "../assets/css/dados-registro.css";
 
 export default function RegistroVisitante(props) {
     const axios = useAxiosPrivate();
+    const controlador = new AbortController();
 
     const [formData, setFormData] = React.useState({
         cadastradoPor: "",
@@ -13,32 +14,31 @@ export default function RegistroVisitante(props) {
         modificadoEm: "",
     });
 
+    async function getCadastradoPor() {
+        try {
+            const response = await axios.get(`/usuario?id=${props.cadastradoPor}`, {signal: controlador.signal});
+            return response.data.nome;
+        } catch (error) {
+            if (error.code === "ERR_CANCELED")
+                return;
+            console.log(error);
+        }
+    }
+    async function getModificadoPor() {
+        try {
+            const response = await axios.get(`/usuario?id=${props.modificadoPor}`, {signal: controlador.signal});
+            return response.data.nome;
+        } catch (error) {
+            if (error.code === "ERR_CANCELED")
+                return;
+            console.log(error);
+        }
+    }
+
     useEffect(() => {
         let isMounted = true;
         let cadastradoPor = "";
         let modificadoPor = "";
-        const controlador = new AbortController();
-
-        async function getCadastradoPor() {
-            try {
-                const response = await axios.get(`/usuario?id=${props.cadastradoPor}`, {signal: controlador.signal});
-                return response.data.nome;
-            } catch (error) {
-                if (error.code === "ERR_CANCELED")
-                    return;
-                console.log(error);
-            }
-        }
-        async function getModificadoPor() {
-            try {
-                const response = await axios.get(`/usuario?id=${props.modificadoPor}`, {signal: controlador.signal});
-                return response.data.nome;
-            } catch (error) {
-                if (error.code === "ERR_CANCELED")
-                    return;
-                console.log(error);
-            }
-        }
 
         async function preencherCampos() {
             if(props.cadastradoEm || props.modificadoEm) {
@@ -59,7 +59,6 @@ export default function RegistroVisitante(props) {
                 }
             }
         }
-
         preencherCampos();
 
         return () => {
