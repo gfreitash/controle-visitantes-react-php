@@ -24,6 +24,8 @@ export default function RegistroVisitante(props) {
                 const response = await axios.get(`/usuario?id=${props.cadastradoPor}`, {signal: controlador.signal});
                 return response.data.nome;
             } catch (error) {
+                if (error.code === "ERR_CANCELED")
+                    return;
                 console.log(error);
             }
         }
@@ -32,6 +34,8 @@ export default function RegistroVisitante(props) {
                 const response = await axios.get(`/usuario?id=${props.modificadoPor}`, {signal: controlador.signal});
                 return response.data.nome;
             } catch (error) {
+                if (error.code === "ERR_CANCELED")
+                    return;
                 console.log(error);
             }
         }
@@ -47,10 +51,10 @@ export default function RegistroVisitante(props) {
 
                 if (isMounted) {
                     setFormData({
-                        cadastradoPor: cadastradoPor,
-                        cadastradoEm: props.cadastradoEm,
-                        modificadoPor: modificadoPor,
-                        modificadoEm: props.modificadoEm
+                        cadastradoPor: cadastradoPor ?? "",
+                        cadastradoEm: props.cadastradoEm ?? "",
+                        modificadoPor: modificadoPor ?? "",
+                        modificadoEm: props.modificadoEm ?? ""
                     });
                 }
             }
