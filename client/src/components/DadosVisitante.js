@@ -24,12 +24,12 @@ export default function DadosVisitante(props) {
     const [cpfDisabled, setCpfDisabled] = useState(props.estadoCpf?.toLowerCase() === "disabled");
     const [cpfReadOnly, setCpfReadOnly] = useState(props.estadoCpf?.toLowerCase() === "readonly");
 
-    const placeholder = {
+    const [placeholder, setPlaceholder] = useState({
         cpf: "Insira o cpf do visitante",
         nome: "Insira o nome do visitante",
         identidade: "Insira o número do documento",
         expedidor: "Insira o órgão expedidor",
-    }
+    });
 
     function handleChange(event) {
         const {name, value} = event.target;
@@ -118,6 +118,19 @@ export default function DadosVisitante(props) {
                 setFormData({...formData, cpf: Funcoes.mascaraCPF(props.cpf)});
             }
             preencherCampos();
+            setPlaceholder({
+                    cpf: "",
+                    nome: "",
+                    identidade: "",
+                    expedidor: "",
+            });
+        } else {
+            setPlaceholder({
+                cpf: "Insira o cpf do visitante",
+                nome: "Insira o nome do visitante",
+                identidade: "Insira o número do documento",
+                expedidor: "Insira o órgão expedidor",
+            })
         }
     },[disabled, readOnly]);
 
