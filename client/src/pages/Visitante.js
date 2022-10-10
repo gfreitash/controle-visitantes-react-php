@@ -11,7 +11,7 @@ import DadosVisitante from "../components/DadosVisitante";
 import FotoVisitante from "../components/FotoVisitante";
 import Titulo from "../components/Titulo";
 import RegistroVisitante from "../components/RegistroVisitante";
-import AcaoEditar from "../components/AcaoEditar";
+import BotoesAcao from "../components/BotoesAcao";
 import useInvalidSessionHandler from "../hooks/useInvalidSessionHandler";
 
 export default function Visitante() {
@@ -93,14 +93,15 @@ export default function Visitante() {
     useEffect(() => {
         if(resultadoBusca.id) {
             setConteudoTitulo(
-                <AcaoEditar
+                <BotoesAcao
+                    cpf = {cpf}
                     onClickEditar={()=>{setEditavel(true)}}
                     onClickCancelar={()=>{setEditavel(false)}}
                     onClickSalvar={onClickSalvar}
                 />
             );
         }
-    },[resultadoBusca]);
+    },[resultadoBusca, editavel]);
 
     useEffect(() => {
         if (editavel) {

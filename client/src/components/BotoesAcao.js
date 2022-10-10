@@ -1,15 +1,23 @@
 import React, {useState} from "react";
+import {Link} from "react-router-dom";
 
-export default function AcaoEditar(props) {
+export default function BotoesAcao(props) {
     const [editando, setEditando] = useState(false);
 
     let btn__margin = {
         margin: "0 0.2rem"
     }
 
-    const botaoEditar = () => {
+    const botoesNovaVisitaEditar = () => {
         return (
-            <button type="button" className="btn btn-dark" onClick={onClickEditar}>Editar</button>
+            <div>
+                <Link to={`/nova-visita?cpf=${props.cpf}`}>
+                    <button type="button" style={editando ? {display: "none"} : {}} className="btn btn-outline-primary btn-acao">
+                        Nova visita
+                    </button>
+                </Link>
+                <button type="button" className="btn btn-dark" onClick={onClickEditar}>Editar</button>
+            </div>
         );
     }
 
@@ -49,7 +57,7 @@ export default function AcaoEditar(props) {
 
     return (
         <>
-            {editando ? botoesCancelarSalvar() : botaoEditar()}
+            {editando ? botoesCancelarSalvar() : botoesNovaVisitaEditar()}
         </>
     )
 }
