@@ -15,14 +15,14 @@ use Psr\Http\Message\ServerRequestInterface;
 class ControladorVisitante extends ControladorRest
 {
     private array $ERROS = [
-        'Visitante não encontrado',
-        'ID do usuário não informado',
-        'Dados incompletos',
-        'CPF inválido',
-        'Já existe um visitante cadastrado com esse CPF',
-        'Já existe outro visitante cadastrado com esse CPF',
-        'Ordem ou tipo de ordenação inválida'
-        ];
+        0 => 'Visitante não encontrado',
+        1 => 'ID do usuário não informado',
+        2 => 'Dados incompletos',
+        3 => 'CPF inválido',
+        4 => 'Já existe um visitante cadastrado com esse CPF',
+        5 => 'Já existe outro visitante cadastrado com esse CPF',
+        6 => 'Ordem ou tipo de ordenação inválida'
+    ];
 
     public function __construct(private readonly RepositorioVisitante $repositorioVisitante)
     {
