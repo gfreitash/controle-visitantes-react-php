@@ -68,7 +68,7 @@ class RepositorioVisitantePDO extends DataLayer implements RepositorioVisitante
         $arr = $visitante->paraArray();
         $vs = $this->findById((int) $arr['id']);
         if (!$vs) {
-            $vs = $this->find("cpf = :cpf", "cpf={$arr['id']}");
+            $vs = $this->find("cpf = :cpf", "cpf={$arr['cpf']}");
         }
         if (!$vs) {
             return false;
