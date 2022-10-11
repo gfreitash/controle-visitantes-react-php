@@ -25,10 +25,10 @@ export default function DadosVisitante(props) {
     const [cpfReadOnly, setCpfReadOnly] = useState(props.estadoCpf?.toLowerCase() === "readonly");
 
     const [placeholder, setPlaceholder] = useState({
-        cpf: "Insira o cpf do visitante",
-        nome: "Insira o nome do visitante",
-        identidade: "Insira o número do documento",
-        expedidor: "Insira o órgão expedidor",
+        cpf: "",
+        nome: "",
+        identidade: "",
+        expedidor: "",
     });
 
     function handleChange(event) {
