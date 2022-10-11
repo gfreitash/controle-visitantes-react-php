@@ -12,7 +12,7 @@ export default function BotoesAcao(props) {
         return (
             <div>
                 <Link to={`/nova-visita?cpf=${props.cpf}`}>
-                    <button type="button" style={editando ? {display: "none"} : {}} className="btn btn-outline-primary btn-acao">
+                    <button type="button" style={editando || props.mostrarBotaoVisita===false ? {display: "none"} : {}} className="btn btn-outline-primary btn-acao">
                         Nova visita
                     </button>
                 </Link>
