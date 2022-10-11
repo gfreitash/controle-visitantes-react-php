@@ -2,8 +2,10 @@
 
 namespace App\Visitantes\Factories;
 
+use App\Visitantes\Interfaces\RepositorioVisita;
 use App\Visitantes\Interfaces\RepositorioVisitante;
 use App\Visitantes\Repositories\RepositorioVisitantePDO;
+use App\Visitantes\Repositories\RepositorioVisitaPDO;
 use DI\Container;
 use DI\ContainerBuilder;
 use Exception;
@@ -23,6 +25,9 @@ class FabricaContainer
             RepositorioVisitante::class => function () {
                 return RepositorioVisitantePDO::obterRepositorioVisitante();
             },
+            RepositorioVisita::class => function () {
+                return RepositorioVisitaPDO::obterRepositorioVisita();
+            }
         ]);
         try {
             return $construtor->build();
