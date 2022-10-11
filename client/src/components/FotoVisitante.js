@@ -76,7 +76,7 @@ export default function FotoVisitante(props) {
                      height="190px" width="100%" id="fotoCliente" ref={fotoClienteRef} key={foto}/>
             </div>
 
-            <input type="hidden" name="excluirFoto" id="excluirFoto" value={excluirFoto.toString()}/>
+            <input type="hidden" name="excluirFoto" id="excluirFoto" value={excluirFoto.toString()} disabled={props.disabled}/>
 
             {props.editavel && (
                 <div className="foto-input">
