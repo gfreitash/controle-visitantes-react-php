@@ -3,19 +3,20 @@
 namespace App\Visitantes\Interfaces;
 
 use App\Visitantes\Models\RespostaJson;
-use Nyholm\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 abstract class ControladorRest implements RequestHandlerInterface
 {
+    protected readonly RespostaJson $_500;
     protected readonly RespostaJson $_501;
     protected readonly RespostaJson $_404;
     protected readonly RespostaJson $_405;
 
     public function __construct()
     {
+        $this->_500 = new RespostaJson(500, json_encode(['error' => 'Erro interno desconhecido']));
         $this->_501 =  new RespostaJson(501, "Método não implementado");
         $this->_404 =  new RespostaJson(404, "Recurso não encontrado");
         $this->_405 =  new RespostaJson(405, "Método não permitido");
