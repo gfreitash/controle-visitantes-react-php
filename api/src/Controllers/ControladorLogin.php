@@ -12,7 +12,9 @@ use Psr\Http\Message\ServerRequestInterface;
 class ControladorLogin extends ControladorRest
 {
     public function __construct(private readonly RepositorioUsuario $repositorioUsuario)
-    {}
+    {
+        parent::__construct();
+    }
 
     public function get(ServerRequestInterface $request): ResponseInterface
     {
