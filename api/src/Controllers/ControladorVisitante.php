@@ -194,7 +194,6 @@ class ControladorVisitante extends ControladorRest
 
         $offset = ($pagina - 1) * $limite;
         if (array_key_exists($ordenarPor, $buscarPor) && in_array(strtoupper($ordem), ['ASC', 'DESC'])) {
-            array_shift($buscarPor);
             $buscarPor = [$ordenarPor => $ordem] + $buscarPor;
         } else {
             return new RespostaJson(400, json_encode(['error' => $this->ERROS[6]]));
@@ -213,10 +212,10 @@ class ControladorVisitante extends ControladorRest
             $quantidadePaginas = 1;
         }
         $conteudoResposta = [
-            'quantidadeVisitantes' => $quantidadeVisitantes,
+            'quantidadeTotal' => $quantidadeVisitantes,
             'quantidadePaginas' => $quantidadePaginas,
             'paginaAtual' => $pagina,
-            'visitantes' => $resultado
+            'dados' => $resultado
         ];
 
         return new RespostaJson(200, json_encode($conteudoResposta));
