@@ -2,6 +2,7 @@
 
 namespace App\Visitantes\Repositories;
 
+use App\Visitantes\Interfaces\JoinableDataLayer;
 use App\Visitantes\Models\Conexao;
 use App\Visitantes\Models\DadosVisitante;
 use CoffeeCode\DataLayer\DataLayer;
@@ -10,7 +11,7 @@ use App\Visitantes\Interfaces\RepositorioVisitante;
 use App\Visitantes\Models\Visitante;
 use App\Visitantes\Helpers\Utils;
 
-class RepositorioVisitantePDO extends DataLayer implements RepositorioVisitante
+class RepositorioVisitantePDO extends JoinableDataLayer implements RepositorioVisitante
 {
     public const BUSCAR_POR = [
         'nome' => 'ASC',
@@ -88,7 +89,7 @@ class RepositorioVisitantePDO extends DataLayer implements RepositorioVisitante
     {
         $this->find();
         if ($ordenar_por) {
-            $this->order($this->ordenarPor($ordenar_por));
+            $this->order(Utils::arrayParaString($ordenar_por));
         }
         if ($limit) {
             $this->limit($limit);
@@ -113,7 +114,7 @@ class RepositorioVisitantePDO extends DataLayer implements RepositorioVisitante
         }
 
         if ($ordenarPor) {
-            $this->order($this->ordenarPor($ordenarPor));
+            $this->order(Utils::arrayParaString($ordenarPor));
         }
         if ($limit) {
             $this->limit($limit);
@@ -130,20 +131,6 @@ class RepositorioVisitantePDO extends DataLayer implements RepositorioVisitante
     {
         $this->buscarPorCpf($cpf);
         return $this->id;
-    }
-
-    private function ordenarPor(array $arrayAssoc): string
-    {
-        $append = "";
-        foreach ($arrayAssoc as $chave => $valor) {
-            if ($chave !== array_key_last($arrayAssoc)) {
-                $append .= $chave . " " . $valor . ", ";
-            } else {
-                $append .= $chave . " " . $valor;
-            }
-        }
-
-        return $append;
     }
 
     private function atribuirPropriedades(array $propriedades): void

@@ -12,6 +12,20 @@ class Utils
             'datetime_local_curto' => 'd/m/Y H:i',
             'date_local' => 'd/m/Y'];
 
+    public static function arrayParaString(array $arrayAssoc): string
+    {
+        $append = "";
+        foreach ($arrayAssoc as $chave => $valor) {
+            if ($chave !== array_key_last($arrayAssoc)) {
+                $append .= $chave . " " . $valor . ", ";
+            } else {
+                $append .= $chave . " " . $valor;
+            }
+        }
+
+        return $append;
+    }
+
     public static function formatarData($data, string $formatoEntrada, string $formatoSaida): string
     {
         if ($data !== null
