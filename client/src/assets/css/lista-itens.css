@@ -26,14 +26,24 @@
 }
 
 th {
-    align-items: center;
     color: inherit;
     text-decoration: none;
     cursor: pointer;
 }
+
 th:hover {
     color: #aaa;
     text-decoration: none;
+}
+
+.th__conteudo {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.th__conteudo__elemento {
+    margin-right: .5rem;
 }
 
 th > svg {
@@ -41,11 +51,32 @@ th > svg {
     margin: 0 .2rem;
 }
 
+td {
+    vertical-align: middle;
+}
+
 td > a > svg {
     color: black;
 }
 
-.icone-th {
+table .ilimitado {
+}
+
+table .limitado {
+    width: 8.5rem;
+    min-width: 8.5rem;
+}
+
+table .data {
+    width: 6.5rem;
+}
+
+table .icone {
+    width: 2.5rem;
+    text-align: center;
+}
+
+table .icone__th {
     cursor: auto;
 }
 
@@ -53,21 +84,5 @@ td > a > svg {
     font-size: large;
     font-weight: lighter;
     font-style: italic;
-    text-align: center;
-}
-
-th:nth-child(1),
-td:nth-child(1) {
-    width: 8.5rem;
-    min-width: 8.5rem;
-}
-
-th:nth-child(3), th:nth-child(4), th:nth-child(5),
-td:nth-child(3), td:nth-child(4), td:nth-child(5) {
-    width: 6.5rem;
-}
-th:nth-child(6), th:nth-child(7),
-td:nth-child(6), td:nth-child(7) {
-    width: 2.5rem;
     text-align: center;
 }

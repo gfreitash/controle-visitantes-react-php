@@ -7,7 +7,14 @@ import "../assets/css/paginador.css";
 export default function Paginador(props) {
     const URL_PAGINA = props.urlPagina;
     const QUERY_STRING = props.queryString;
-    const handleNavegacao = props.handleNavegacao;
+    const handleNavegacao = (pagina) => {
+        return () => {
+            props.handleNavegacao(pagina)();
+            if (props.foco) {
+               props.foco.current.scrollIntoView({inline: "start", behavior: "smooth"});
+            }
+        }
+    }
 
     const paginacao = (quantidadePaginas, paginaAtual) => {
         quantidadePaginas = parseInt(quantidadePaginas);
