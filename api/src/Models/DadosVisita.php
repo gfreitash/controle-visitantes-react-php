@@ -7,6 +7,8 @@ use App\Visitantes\Interfaces\Entidade;
 class DadosVisita extends Entidade
 {
     private int $visitante_id;
+    private ?string $cpf;
+    private ?string $nome;
     private string $sala_visita;
     private ?string $motivo_visita;
     private int $foi_liberado;
@@ -17,12 +19,16 @@ class DadosVisita extends Entidade
         $this->sala_visita = $sala_visita;
         $this->foi_liberado = $foi_liberado;
         $this->motivo_visita = null;
+        $this->cpf = null;
+        $this->nome = null;
     }
 
     public function paraArray(): array
     {
         $arr = array();
         $arr['visitante_id'] = $this->visitante_id;
+        $arr['cpf'] = $this->cpf;
+        $arr['nome'] = $this->nome;
         $arr['sala_visita'] = $this->sala_visita;
         $arr['motivo_visita'] = $this->motivo_visita;
         $arr['foi_liberado'] = $this->foi_liberado;
@@ -93,6 +99,39 @@ class DadosVisita extends Entidade
     {
         $this->foi_liberado = $foi_liberado;
     }
+
+    /**
+     * @return string|null
+     */
+    public function getCpf(): ?string
+    {
+        return $this->cpf;
+    }
+
+    /**
+     * @param string|null $cpf
+     */
+    public function setCpf(?string $cpf): void
+    {
+        $this->cpf = $cpf;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getNome(): ?string
+    {
+        return $this->nome;
+    }
+
+    /**
+     * @param string|null $nome
+     */
+    public function setNome(?string $nome): void
+    {
+        $this->nome = $nome;
+    }
+
 
 
 }

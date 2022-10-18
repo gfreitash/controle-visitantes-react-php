@@ -15,15 +15,17 @@ interface RepositorioVisita
 
     public function removerVisitaPorId(int $id): bool;
 
-    public function obterTodasVisitas(string $status="", $ordenarPor=false, int $limite=0, int $offset=0): array;
+    public function obterTodasVisitas(string $status="", array $ordenarPor=[], int $limite=0, int $offset=0): array;
 
     public function obterTodasVisitasDeVisitante(
         Visitante $visitante,
         string $status="",
-        $ordenarPor=false,
+        array $ordenarPor=[],
         int $limite=0,
         int $offset=0
     ): array;
+
+    public function obterTotalVisitas(string $status=""): int;
 
     public static function obterRepositorioVisita(): RepositorioVisita;
 

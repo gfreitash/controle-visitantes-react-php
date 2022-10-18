@@ -2,6 +2,8 @@
 
 namespace App\Visitantes\Repositories;
 
+use App\Visitantes\Interfaces\JoinableDataLayer;
+use App\Visitantes\Models\Conexao;
 use App\Visitantes\Models\DadosVisita;
 use CoffeeCode\DataLayer\DataLayer;
 use DateTime;
@@ -10,12 +12,27 @@ use App\Visitantes\Models\Visita;
 use App\Visitantes\Models\Visitante;
 use App\Visitantes\Helpers\Utils;
 
-class RepositorioVisitaPDO extends DataLayer implements RepositorioVisita
+class RepositorioVisitaPDO extends JoinableDataLayer implements RepositorioVisita
 {
     public const BUSCAR_POR = [
-        'data_visita' => 'DESC',
-        'modificada_em' => 'DESC',
-        'finalizada_em' => 'DESC'
+        'id' => 'id',
+        'data_visita' => 'tb_visita.data_visita',
+        'nome' => 'tb_visitante.nome',
+        'modificada_em' => 'tb_visita.modificada_em',
+        'finalizada_em' => 'tb_visita.finalizada_em',
+        'cpf' => 'tb_visitante.cpf',
+        'sala_visita' => 'tb_visita.sala_visita',
+        'motivo_visita' => 'tb_visita.motivo_visita'
+    ];
+
+    public const BUSCAR_POR_JOIN = [
+        'tb_visita.data_visita' => 'DESC',
+        'tb_visitante.nome' => 'ASC',
+        'tb_visita.modificada_em' => 'DESC',
+        'tb_visita.finalizada_em' => 'DESC',
+        'tb_visitante.cpf' => 'ASC',
+        'tb_visita.sala_visita' => 'ASC',
+        'tb_visita.motivo_visita' => 'ASC'
     ];
 
     public function __construct()
@@ -26,6 +43,16 @@ class RepositorioVisitaPDO extends DataLayer implements RepositorioVisita
             "id",
             false
         );
+    }
+
+    private function obterVisitante(): RepositorioVisitaPDO
+    {
+        $dadosVisitante = RepositorioVisitantePDO::obterRepositorioVisitante()
+            ->findById($this->visitante_id, "cpf, nome")
+            ->data();
+
+        $this->visitante = $dadosVisitante;
+        return $this;
     }
 
     public function adicionarVisita(Visita $visita): bool|Visita
@@ -52,6 +79,7 @@ class RepositorioVisitaPDO extends DataLayer implements RepositorioVisita
     public function alterarVisita(Visita $visita): bool
     {
         $arr = $visita->paraArray();
+        unset($arr['cpf'], $arr['nome']);
 
         /** @var RepositorioVisitaPDO|null $vs */
         $vs = $this->findById($arr['id']);
@@ -69,19 +97,28 @@ class RepositorioVisitaPDO extends DataLayer implements RepositorioVisita
         return $this->destroy();
     }
 
-    public function obterTodasVisitas(string $status = "", $ordenarPor = false, int $limite = 0, int $offset = 0): array
+    public function obterTodasVisitas(
+        string $status = "",
+        array $ordenarPor = [],
+        int $limite = 0,
+        int $offset = 0
+    ): array
     {
+        $repVisitante = RepositorioVisitantePDO::obterRepositorioVisitante();
+        $entidadeVisita = $this->getEntity();
+        $entidadeVisitante = $repVisitante->getEntity();
+        $colunas = "$entidadeVisita.*, $entidadeVisitante.nome, $entidadeVisitante.cpf";
+
         $terms = "";
         if ($status && in_array($status, Visita::STATUS)) {
             if ($status === Visita::STATUS[0]) {
-                $terms .= "AND finalizada_em IS NOT NULL";
+                $terms .= "$entidadeVisita.finalizada_em IS NOT NULL";
             } else {
-                $terms .= "AND finalizada_em IS NULL";
+                $terms .= "$entidadeVisita.finalizada_em IS NULL";
             }
         }
-
-        if ($ordenarPor && in_array($ordenarPor, self::BUSCAR_POR)) {
-            $this->order($this->ordenarPor($ordenarPor));
+        if (!empty($ordenarPor)) {
+            $this->order(Utils::arrayParaString($ordenarPor));
         }
 
         if ($limite > 0) {
@@ -92,7 +129,7 @@ class RepositorioVisitaPDO extends DataLayer implements RepositorioVisita
             $this->offset($offset);
         }
 
-        $this->find($terms);
+        $this->findWithJoin($entidadeVisitante, "id", "visitante_id", $terms, columns: $colunas);
         $resultado = $this->fetch(true);
         return $this->count() ? array_map(fn($rs) => $rs->data(), $resultado) : [];
     }
@@ -100,7 +137,7 @@ class RepositorioVisitaPDO extends DataLayer implements RepositorioVisita
     public function obterTodasVisitasDeVisitante(
         Visitante $visitante,
         string $status = "",
-        $ordenarPor = false,
+        array $ordenarPor = array(),
         int $limite = 0,
         int $offset = 0
     ): array
@@ -111,7 +148,10 @@ class RepositorioVisitaPDO extends DataLayer implements RepositorioVisita
             return array();
         }
         $visitanteId = $vs->getId();
-        $where = "visitante_id = :visitante_id";
+        $entidadeVisita = $this->getEntity();
+        $entidadeVisitante = $repVisitante->getEntity();
+
+        $where = "$entidadeVisita.visitante_id = :visitante_id";
         $param = "visitante_id=$visitanteId";
 
         if ($status && in_array($status, Visita::STATUS)) {
@@ -122,8 +162,8 @@ class RepositorioVisitaPDO extends DataLayer implements RepositorioVisita
             }
         }
 
-        if ($ordenarPor && in_array($ordenarPor, self::BUSCAR_POR)) {
-            $this->order($this->ordenarPor($ordenarPor));
+        if ($ordenarPor && in_array($ordenarPor, self::BUSCAR_POR_JOIN)) {
+            $this->order(Utils::arrayParaString($ordenarPor));
         }
 
         if ($limite > 0) {
@@ -134,9 +174,33 @@ class RepositorioVisitaPDO extends DataLayer implements RepositorioVisita
             $this->offset($offset);
         }
 
-        $this->find($where, $param);
+        $this->findWithJoin($entidadeVisitante, "id", "visitante_id", $where, $param);
         $resultado = $this->fetch(true);
         return $this->count() ? array_map(fn($rs) => $rs->data(), $resultado) : [];
+    }
+
+    public function obterTotalVisitas(string $status = ""): int
+    {
+        $conexao = Conexao::criarConexao();
+        if ($status) {
+            if (in_array($status, Visita::STATUS)) {
+                if ($status === Visita::STATUS[0]) {
+                    $where = "finalizada_em IS NOT NULL";
+                } else {
+                    $where = "finalizada_em IS NULL";
+                }
+            } else {
+                return 0;
+            }
+
+            $query = "SELECT COUNT(*) FROM tb_visita WHERE $where";
+            $stmt = $conexao->query($query);
+        } else {
+            $query = "SELECT COUNT(*) FROM tb_visita";
+            $stmt = $conexao->query($query);
+        }
+
+        return (int) $stmt->fetch()["COUNT(*)"];
     }
 
     public static function obterRepositorioVisita(): RepositorioVisita
@@ -147,12 +211,18 @@ class RepositorioVisitaPDO extends DataLayer implements RepositorioVisita
 
     private function criarVisita(DataLayer|array $vs): Visita
     {
+        if ($vs instanceof RepositorioVisitaPDO) {
+            $vs->obterVisitante();
+        }
+
         $dados_visita = new DadosVisita(
             $vs->visitante_id,
             $vs->sala_visita,
             $vs->foi_liberado
         );
         $dados_visita->setMotivoVisita($vs->motivo_visita);
+        $dados_visita->setCpf($vs->visitante->cpf ?? null);
+        $dados_visita->setNome($vs->visitante->nome ?? null);
 
         $visita = new Visita(
             $dados_visita,
@@ -171,20 +241,6 @@ class RepositorioVisitaPDO extends DataLayer implements RepositorioVisita
         );
 
         return $visita;
-    }
-
-    private function ordenarPor(array $arrayAssoc): string
-    {
-        $append = "";
-        foreach ($arrayAssoc as $chave => $valor) {
-            if ($chave !== array_key_last($arrayAssoc)) {
-                $append .= $chave . " " . $valor . ", ";
-            } else {
-                $append .= $chave . " " . $valor;
-            }
-        }
-
-        return $append;
     }
 
     private function atribuirPropriedades(array $propriedades): void
