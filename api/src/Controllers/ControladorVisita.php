@@ -22,7 +22,8 @@ class ControladorVisita extends ControladorRest
         1 => 'ID do usuário não informado',
         2 => 'Dados incompletos ou inválidos',
         3 => 'CPF inválido',
-        4 => 'Ordem ou tipo de ordenação inválida'
+        4 => 'Ordem ou tipo de ordenação inválida',
+        5 => 'Visita não encontrada',
     ];
 
     public function __construct(
@@ -93,7 +94,40 @@ class ControladorVisita extends ControladorRest
 
     public function put(ServerRequestInterface $request): ResponseInterface
     {
-        return $this->_501;
+        global $_PUT;
+        $dados = $_PUT;
+        trigger_error(print_r($dados, true));
+
+        if (empty($dados['idUsuario'])) {
+            return new RespostaJson(403, json_encode(['error' => $this->ERROS[1]]));
+        } elseif (empty($dados['id']) || empty($dados['salaVisita'])
+            || ((int) $dados['foiLiberado']) < 0 || ((int) $dados['foiLiberado']) > 1) {
+            return new RespostaJson(400, json_encode(['error' => $this->ERROS[2]]));
+        }
+
+        $visita = $this->repositorioVisita->buscarPorId($dados['id']);
+        if (!$visita) {
+            return new RespostaJson(404, json_encode(['error' => $this->ERROS[5]]));
+        }
+
+        $visita->getDadosVisita()->setSalaVisita($dados['salaVisita']);
+        $visita->getDadosVisita()->setFoiLiberado($dados['foiLiberado']);
+        $visita->getDadosVisita()->setMotivoVisita($dados['motivoVisita'] ?? null);
+        $visita->setModificadaEm(new \DateTime());
+        $visita->setModificadaPor($dados['idUsuario']);
+
+        if ((int) $dados['foiLiberado'] === 0) {
+            $visita->setFinalizadaEm(new \DateTime());
+            $visita->setFinalizadaPor($dados['idUsuario']);
+        }
+
+        $resultado = $this->repositorioVisita->alterarVisita($visita);
+
+        if (!$resultado) {
+            return $this->_500;
+        }
+
+        return new RespostaJson(200, json_encode($visita));
     }
 
     public function delete(ServerRequestInterface $request): ResponseInterface
@@ -105,7 +139,7 @@ class ControladorVisita extends ControladorRest
 
         $visita = $this->repositorioVisita->buscarPorId($params['id']);
         if (!$visita) {
-            return new RespostaJson(404, json_encode(['error' => $this->ERROS[0]]));
+            return new RespostaJson(404, json_encode(['error' => $this->ERROS[5]]));
         }
 
         $visita->setFinalizadaPor((int) $params['idUsuario']);
@@ -124,7 +158,7 @@ class ControladorVisita extends ControladorRest
     {
         $visita = $this->repositorioVisita->buscarPorId($id);
         if (!$visita) {
-            return new RespostaJson(404, json_encode(['error' => 'Visita não encontrada']));
+            return new RespostaJson(404, json_encode(['error' => $this->ERROS[5]]));
         } else {
             $visita->setFormatoData(Utils::FORMATOS_DATA['web']);
         }

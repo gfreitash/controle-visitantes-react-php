@@ -175,6 +175,24 @@ class Visita extends Entidade
     }
 
     /**
+     * @return DadosVisita
+     */
+    public function getDadosVisita(): DadosVisita
+    {
+        return $this->dados_visita;
+    }
+
+    /**
+     * @param DadosVisita $dados_visita
+     */
+    public function setDadosVisita(DadosVisita $dados_visita): void
+    {
+        $this->dados_visita = $dados_visita;
+    }
+
+
+
+    /**
      * @return string
      */
     public function getFormatoData(): string

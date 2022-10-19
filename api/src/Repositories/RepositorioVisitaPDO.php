@@ -58,12 +58,13 @@ class RepositorioVisitaPDO extends JoinableDataLayer implements RepositorioVisit
     public function adicionarVisita(Visita $visita): bool|Visita
     {
         $arr = $visita->paraArray();
-        unset($arr['modificada_em'], $arr['modificada_por']);
+        unset($arr['modificada_em'], $arr['modificada_por'], $arr['cpf'], $arr['nome']);
         $this->atribuirPropriedades($arr);
 
         if ($this->save()) {
             return $this->buscarPorId($this->id);
         }
+        trigger_error($this->fail()->getMessage());
         return false;
     }
 
