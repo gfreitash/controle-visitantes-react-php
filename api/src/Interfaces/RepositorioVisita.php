@@ -25,7 +25,7 @@ interface RepositorioVisita
         int $offset=0
     ): array;
 
-    public function obterTotalVisitas(string $status=""): int;
+    public function obterTotalVisitas(?string $status=""): int;
 
     public static function obterRepositorioVisita(): RepositorioVisita;
 

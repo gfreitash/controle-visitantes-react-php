@@ -179,7 +179,7 @@ class RepositorioVisitaPDO extends JoinableDataLayer implements RepositorioVisit
         return $this->count() ? array_map(fn($rs) => $rs->data(), $resultado) : [];
     }
 
-    public function obterTotalVisitas(string $status = ""): int
+    public function obterTotalVisitas(?string $status = ""): int
     {
         $conexao = Conexao::criarConexao();
         if ($status) {
@@ -194,12 +194,11 @@ class RepositorioVisitaPDO extends JoinableDataLayer implements RepositorioVisit
             }
 
             $query = "SELECT COUNT(*) FROM tb_visita WHERE $where";
-            $stmt = $conexao->query($query);
         } else {
             $query = "SELECT COUNT(*) FROM tb_visita";
-            $stmt = $conexao->query($query);
         }
 
+        $stmt = $conexao->query($query);
         return (int) $stmt->fetch()["COUNT(*)"];
     }
 
