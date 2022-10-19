@@ -49,17 +49,16 @@ export default function RegistroVisitante(props) {
                     modificadoPor = await getModificadoPor();
                 }
 
-                if (isMounted) {
-                    setFormData({
-                        cadastradoPor: cadastradoPor ?? "",
-                        cadastradoEm: props.cadastradoEm ?? "",
-                        modificadoPor: modificadoPor ?? "",
-                        modificadoEm: props.modificadoEm ?? ""
-                    });
-                }
+                setFormData({
+                    cadastradoPor: cadastradoPor ?? "",
+                    cadastradoEm: props.cadastradoEm ?? "",
+                    modificadoPor: modificadoPor ?? "",
+                    modificadoEm: props.modificadoEm ?? ""
+                });
             }
         }
-        preencherCampos();
+
+        isMounted && preencherCampos();
 
         return () => {
             isMounted = false;
