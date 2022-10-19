@@ -109,7 +109,7 @@ export default function DadosVisitante(props) {
         if(props.onCpfValido && props.cpf && Funcoes.cpfValido(props.cpf)) {
             setFormData({...formData, cpf: Funcoes.mascaraCPF(props.cpf)});
         }
-    },[]);
+    },[props.cpf]);
 
     useEffect(() => {
         if (!props.cpf) {return;}

@@ -1,0 +1,28 @@
+.status-visita {
+    font-size: small;
+    border: 2px solid;
+    border-radius: .375em;
+    padding: .5rem;
+}
+
+.status-visita h2 {
+    align-self: flex-end;
+    margin: 0;
+}
+
+a > svg {
+    color: #fff;
+    margin: 0 .5rem;
+}
+
+.status-visita.aberta {
+    color: #fff;
+    background-color: #198754;
+    border-color: #198754;
+}
+
+.status-visita.fechada {
+    color: #fff;
+    background-color: #6c757d;
+    border-color: #6c757d;
+}

@@ -83,7 +83,7 @@ export default function NovaVisita() {
             <hr/>
             <div id="alerta" ref={alertaRef} className={alerta.mensagem ? `alert alert-${alerta.tipo}` : ""}>{alerta.mensagem}</div>
             <form id='form' encType='multipart/form-data' onSubmit={handleSubmit}>
-                <section className="form-visitante">
+                <section className="form">
                     <FotoVisitante foto={visitante.id ? visitante.foto : ""} disabled/>
 
                     <div className="form-wrapper">

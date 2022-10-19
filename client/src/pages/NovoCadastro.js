@@ -5,7 +5,7 @@ import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import useInvalidSessionHandler from "../hooks/useInvalidSessionHandler";
 import useAuth from "../hooks/useAuth";
 
-import "../assets/css/form-cadatro.css"
+import "../assets/css/form-cadastro.css"
 import {validaCPF} from "../assets/js/modules/dados-visitante";
 
 import Titulo from "../components/Titulo";
@@ -84,7 +84,7 @@ export default function NovoCadastro() {
             <div id="alerta" ref={alertaRef} className={alerta.mensagem ? `alert alert-${alerta.tipo}` : ""}>{alerta.mensagem}</div>
             <form className="needs-validation" id='formContato' encType='multipart/form-data' noValidate
             onSubmit={handleSubmit}>
-                <section className="form-visitante">
+                <section className="form">
                     <FotoVisitante editavel={buscaRealizada && !visitanteEncontrado}
                                    foto={visitanteEncontrado.id ? visitanteEncontrado.foto : ""}/>
 
