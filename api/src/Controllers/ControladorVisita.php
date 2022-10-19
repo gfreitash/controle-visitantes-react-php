@@ -96,7 +96,6 @@ class ControladorVisita extends ControladorRest
     {
         global $_PUT;
         $dados = $_PUT;
-        trigger_error(print_r($dados, true));
 
         if (empty($dados['idUsuario'])) {
             return new RespostaJson(403, json_encode(['error' => $this->ERROS[1]]));
