@@ -12,6 +12,7 @@ import Titulo from "../components/Titulo";
 import FotoVisitante from "../components/FotoVisitante";
 import DadosVisitante from "../components/DadosVisitante";
 import DadosVisita from "../components/DadosVisita";
+import Alerta from "../components/Alerta";
 
 export default function NovaVisita() {
     const axios = useAxiosPrivate();
@@ -81,7 +82,7 @@ export default function NovaVisita() {
         <div className="form-fieldset">
             <Titulo conteudoTitulo={conteudoTitulo}>Nova Visita</Titulo>
             <hr/>
-            <div id="alerta" ref={alertaRef} className={alerta.mensagem ? `alert alert-${alerta.tipo}` : ""}>{alerta.mensagem}</div>
+            <Alerta alerta={alerta} setAlerta={setAlerta} alertaRef={alertaRef}/>
             <form id='form' encType='multipart/form-data' onSubmit={handleSubmit}>
                 <section className="form">
                     <FotoVisitante foto={visitante.id ? visitante.foto : ""} disabled/>

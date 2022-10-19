@@ -11,6 +11,7 @@ import {validaCPF} from "../assets/js/modules/dados-visitante";
 import Titulo from "../components/Titulo";
 import FotoVisitante from "../components/FotoVisitante";
 import DadosVisitante from "../components/DadosVisitante";
+import Alerta from "../components/Alerta";
 
 export default function NovoCadastro() {
     const axios = useAxiosPrivate();
@@ -81,7 +82,7 @@ export default function NovoCadastro() {
         <div className="form-fieldset">
             <Titulo conteudoTitulo={buscaRealizada && visitanteEncontrado ? editarVisitante : ""}>Novo Cadastro</Titulo>
             <hr/>
-            <div id="alerta" ref={alertaRef} className={alerta.mensagem ? `alert alert-${alerta.tipo}` : ""}>{alerta.mensagem}</div>
+            <Alerta alerta={alerta} setAlerta={setAlerta} alertaRef={alertaRef}/>
             <form className="needs-validation" id='formContato' encType='multipart/form-data' noValidate
             onSubmit={handleSubmit}>
                 <section className="form">
