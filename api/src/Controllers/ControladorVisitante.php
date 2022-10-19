@@ -6,6 +6,7 @@ use App\Visitantes\Helpers\Utils;
 use App\Visitantes\Interfaces\ControladorRest;
 use App\Visitantes\Interfaces\RepositorioVisitante;
 use App\Visitantes\Models\DadosVisitante;
+use App\Visitantes\Models\ParametroBusca;
 use App\Visitantes\Models\RespostaJson;
 use App\Visitantes\Models\Visitante;
 use App\Visitantes\Repositories\RepositorioVisitantePDO;
@@ -202,13 +203,18 @@ class ControladorVisitante extends ControladorRest
         $quantidadeVisitantes = $this->repositorioVisitante->obterTotalVisitantes($pesquisa ?? '');
         if ($limite) {
             $resultado = $pesquisa
-                ? $this->repositorioVisitante->buscarVisitantesComo($pesquisa, $buscarPor, $limite, $offset)
-                : $this->repositorioVisitante->buscarTodosVisitantes($buscarPor, $limite, $offset);
+                ? $this->repositorioVisitante->buscarVisitantesComo(
+                    $pesquisa,
+                    new ParametroBusca($buscarPor, $limite, $offset)
+                )
+                : $this->repositorioVisitante->buscarTodosVisitantes(
+                    new ParametroBusca($buscarPor, $limite, $offset)
+                );
             $quantidadePaginas = ceil($quantidadeVisitantes / $limite);
         } else {
             $resultado = $pesquisa
-                ? $this->repositorioVisitante->buscarVisitantesComo($pesquisa, $buscarPor)
-                : $this->repositorioVisitante->buscarTodosVisitantes($buscarPor);
+                ? $this->repositorioVisitante->buscarVisitantesComo($pesquisa, new ParametroBusca($buscarPor))
+                : $this->repositorioVisitante->buscarTodosVisitantes(new ParametroBusca($buscarPor));
             $quantidadePaginas = 1;
         }
         $conteudoResposta = [

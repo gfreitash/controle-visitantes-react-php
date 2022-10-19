@@ -5,6 +5,7 @@ namespace App\Visitantes\Repositories;
 use App\Visitantes\Interfaces\JoinableDataLayer;
 use App\Visitantes\Models\Conexao;
 use App\Visitantes\Models\DadosVisita;
+use App\Visitantes\Models\ParametroBusca;
 use CoffeeCode\DataLayer\DataLayer;
 use DateTime;
 use App\Visitantes\Interfaces\RepositorioVisita;
@@ -100,9 +101,7 @@ class RepositorioVisitaPDO extends JoinableDataLayer implements RepositorioVisit
 
     public function obterTodasVisitas(
         string $status = "",
-        array $ordenarPor = [],
-        int $limite = 0,
-        int $offset = 0
+        ParametroBusca $parametros = null
     ): array
     {
         $repVisitante = RepositorioVisitantePDO::obterRepositorioVisitante();
@@ -118,16 +117,16 @@ class RepositorioVisitaPDO extends JoinableDataLayer implements RepositorioVisit
                 $terms .= "$entidadeVisita.finalizada_em IS NULL";
             }
         }
-        if (!empty($ordenarPor)) {
-            $this->order(Utils::arrayParaString($ordenarPor));
+        if (!empty($parametros?->ordenarPor)) {
+            $this->order(Utils::arrayParaString($parametros->ordenarPor));
         }
 
-        if ($limite > 0) {
-            $this->limit($limite);
+        if ($parametros?->limite > 0) {
+            $this->limit($parametros->limite);
         }
 
-        if ($offset > 0) {
-            $this->offset($offset);
+        if ($parametros?->offset > 0) {
+            $this->offset($parametros->offset);
         }
 
         $this->findWithJoin($entidadeVisitante, "id", "visitante_id", $terms, columns: $colunas);
@@ -138,9 +137,7 @@ class RepositorioVisitaPDO extends JoinableDataLayer implements RepositorioVisit
     public function obterTodasVisitasDeVisitante(
         Visitante $visitante,
         string $status = "",
-        array $ordenarPor = array(),
-        int $limite = 0,
-        int $offset = 0
+        ParametroBusca $parametros = null
     ): array
     {
         $repVisitante = RepositorioVisitantePDO::obterRepositorioVisitante();
@@ -163,16 +160,16 @@ class RepositorioVisitaPDO extends JoinableDataLayer implements RepositorioVisit
             }
         }
 
-        if ($ordenarPor && in_array($ordenarPor, self::BUSCAR_POR_JOIN)) {
-            $this->order(Utils::arrayParaString($ordenarPor));
+        if ($parametros?->ordenarPor && in_array($parametros->ordenarPor, self::BUSCAR_POR_JOIN)) {
+            $this->order(Utils::arrayParaString($parametros->ordenarPor));
         }
 
-        if ($limite > 0) {
-            $this->limit($limite);
+        if ($parametros?->limite > 0) {
+            $this->limit($parametros->limite);
         }
 
-        if ($offset > 0) {
-            $this->offset($offset);
+        if ($parametros?->offset > 0) {
+            $this->offset($parametros->offset);
         }
 
         $this->findWithJoin($entidadeVisitante, "id", "visitante_id", $where, $param);

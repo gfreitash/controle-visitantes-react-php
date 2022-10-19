@@ -5,6 +5,7 @@ namespace App\Visitantes\Repositories;
 use App\Visitantes\Interfaces\JoinableDataLayer;
 use App\Visitantes\Models\Conexao;
 use App\Visitantes\Models\DadosVisitante;
+use App\Visitantes\Models\ParametroBusca;
 use CoffeeCode\DataLayer\DataLayer;
 use DateTime;
 use App\Visitantes\Interfaces\RepositorioVisitante;
@@ -85,23 +86,23 @@ class RepositorioVisitantePDO extends JoinableDataLayer implements RepositorioVi
         return $this->destroy();
     }
 
-    public function buscarTodosVisitantes($ordenar_por=false, int $limit=0, int $offset=0): array
+    public function buscarTodosVisitantes(ParametroBusca $parametros = null): array
     {
         $this->find();
-        if ($ordenar_por) {
-            $this->order(Utils::arrayParaString($ordenar_por));
+        if ($parametros?->ordenarPor) {
+            $this->order(Utils::arrayParaString($parametros->ordenarPor));
         }
-        if ($limit) {
-            $this->limit($limit);
+        if ($parametros?->limite) {
+            $this->limit($parametros->limite);
         }
-        if ($limit && $offset) {
-            $this->offset($offset);
+        if ($parametros?->limite && $parametros?->offset) {
+            $this->offset($parametros->offset);
         }
         $resultado = $this->fetch(true);
         return $this->count() ? array_map(fn($rs) => $rs->data(), $resultado) : [];
     }
 
-    public function buscarVisitantesComo($termo, $ordenarPor=false, int $limit=0, int $offset=0): array
+    public function buscarVisitantesComo($termo, ParametroBusca $parametros = null): array
     {
         if (DateTime::createFromFormat('d/m/Y', $termo)) {
             $termo = Utils::formatarData($termo, Utils::FORMATOS_DATA['date_local'], Utils::FORMATOS_DATA['date']);
@@ -113,14 +114,14 @@ class RepositorioVisitantePDO extends JoinableDataLayer implements RepositorioVi
             $this->find($where, "cpf=$termo&nome=$termo");
         }
 
-        if ($ordenarPor) {
-            $this->order(Utils::arrayParaString($ordenarPor));
+        if ($parametros?->ordenarPor) {
+            $this->order(Utils::arrayParaString($parametros?->ordenarPor));
         }
-        if ($limit) {
-            $this->limit($limit);
+        if ($parametros?->limite) {
+            $this->limit($parametros?->limite);
         }
-        if ($limit && $offset) {
-            $this->offset($offset);
+        if ($parametros?->limite && $parametros?->offset) {
+            $this->offset($parametros->offset);
         }
 
         $resultado = $this->fetch(true);

@@ -2,6 +2,7 @@
 
 namespace App\Visitantes\Interfaces;
 
+use App\Visitantes\Models\ParametroBusca;
 use App\Visitantes\Models\Visita;
 use App\Visitantes\Models\Visitante;
 
@@ -15,14 +16,15 @@ interface RepositorioVisita
 
     public function removerVisitaPorId(int $id): bool;
 
-    public function obterTodasVisitas(string $status="", array $ordenarPor=[], int $limite=0, int $offset=0): array;
+    public function obterTodasVisitas(
+        string $status="",
+        ParametroBusca $parametros = null
+    ): array;
 
     public function obterTodasVisitasDeVisitante(
         Visitante $visitante,
         string $status="",
-        array $ordenarPor=[],
-        int $limite=0,
-        int $offset=0
+        ParametroBusca $parametros=null
     ): array;
 
     public function obterTotalVisitas(?string $status=""): int;

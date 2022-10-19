@@ -8,6 +8,7 @@ use App\Visitantes\Interfaces\RepositorioVisita;
 use App\Visitantes\Interfaces\RepositorioVisitante;
 use App\Visitantes\Models\DadosVisita;
 use App\Visitantes\Models\DadosVisitante;
+use App\Visitantes\Models\ParametroBusca;
 use App\Visitantes\Models\RespostaJson;
 use App\Visitantes\Models\Visita;
 use App\Visitantes\Models\Visitante;
@@ -209,13 +210,13 @@ class ControladorVisita extends ControladorRest
         $quantidadeVisitas = $this->repositorioVisita->obterTotalVisitas($status);
         if ($limite) {
             $resultado = $status
-                ? $this->repositorioVisita->obterTodasVisitas($status, $buscarPor, $limite, $offset)
-                : $this->repositorioVisita->obterTodasVisitas("", $buscarPor, $limite, $offset);
+                ? $this->repositorioVisita->obterTodasVisitas($status, new ParametroBusca($buscarPor, $limite, $offset))
+                : $this->repositorioVisita->obterTodasVisitas("", new ParametroBusca($buscarPor, $limite, $offset));
             $quantidadePagina = ceil($quantidadeVisitas / $limite);
         } else {
             $resultado = $status
-                ? $this->repositorioVisita->obterTodasVisitas($status, $buscarPor)
-                : $this->repositorioVisita->obterTodasVisitas("", $buscarPor);
+                ? $this->repositorioVisita->obterTodasVisitas($status, new ParametroBusca($buscarPor))
+                : $this->repositorioVisita->obterTodasVisitas("", new ParametroBusca($buscarPor));
             $quantidadePagina = 1;
         }
 

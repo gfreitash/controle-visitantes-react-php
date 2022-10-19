@@ -2,6 +2,7 @@
 
 namespace App\Visitantes\Interfaces;
 
+use App\Visitantes\Models\ParametroBusca;
 use App\Visitantes\Models\Visitante;
 
 interface RepositorioVisitante
@@ -16,9 +17,9 @@ interface RepositorioVisitante
 
     public function removerVisitantePorCPF(string $cpf): bool;
 
-    public function buscarTodosVisitantes($ordenar_por=false, int $limit=0, int $offset=0): array;
+    public function buscarTodosVisitantes(ParametroBusca $parametros = null): array;
 
-    public function buscarVisitantesComo($termo, $ordenarPor=false, int $limit=0, int $offset=0): array;
+    public function buscarVisitantesComo($termo, ParametroBusca $parametros = null): array;
 
     public function obterTotalVisitantes(string $como=""): int;
 
