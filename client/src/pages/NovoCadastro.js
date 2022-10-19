@@ -32,7 +32,7 @@ export default function NovoCadastro() {
     };
 
     const editarVisitante = (
-        <Link to={`/visitante?cpf=${visitanteEncontrado.cpf}`}>
+        <Link to={`/visitante?cpf=${visitanteEncontrado?.cpf}`}>
             <button type="button" className="btn btn-success btn-acao">
                 Detalhes
             </button>
@@ -87,7 +87,7 @@ export default function NovoCadastro() {
             onSubmit={handleSubmit}>
                 <section className="form">
                     <FotoVisitante editavel={buscaRealizada && !visitanteEncontrado}
-                                   foto={visitanteEncontrado.id ? visitanteEncontrado.foto : ""}/>
+                                   foto={visitanteEncontrado?.id ? visitanteEncontrado.foto : ""}/>
 
                     <div className="form-wrapper">
                         <div className="width--95">

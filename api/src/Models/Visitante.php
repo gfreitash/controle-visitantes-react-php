@@ -20,6 +20,7 @@ class Visitante extends Entidade
     {
         $this->dadosVisitante = $dadosVisitante;
 
+        $this->id = null;
         $this->cadastrado_em = null;
         $this->cadastrado_por = null;
         $this->modificado_em = null;
