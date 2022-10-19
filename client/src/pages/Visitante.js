@@ -4,7 +4,7 @@ import useQuery from "../hooks/useQuery";
 import useAuth from "../hooks/useAuth";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 
-import "../assets/css/form-cadatro.css"
+import "../assets/css/form-cadastro.css"
 import {validaCPF} from "../assets/js/modules/dados-visitante";
 
 import DadosVisitante from "../components/DadosVisitante";
@@ -13,6 +13,7 @@ import Titulo from "../components/Titulo";
 import RegistroVisitante from "../components/RegistroVisitante";
 import BotoesAcao from "../components/BotoesAcao";
 import useInvalidSessionHandler from "../hooks/useInvalidSessionHandler";
+import Alerta from "../components/Alerta";
 
 export default function Visitante() {
     const query = useQuery();
@@ -113,8 +114,8 @@ export default function Visitante() {
         <div className="form-fieldset">
             <Titulo conteudoTitulo={conteudoTitulo}>Visitante</Titulo>
             <hr/>
-            <div id="alerta" ref={alertaRef} className={alerta.mensagem ? `alert alert-${alerta.tipo}` : ""}>{alerta.mensagem}</div>
-            <form ref={formRef} className="form-visitante" encType='multipart/form-data' onSubmit={handleSubmit}>
+            <Alerta alertaRef={alertaRef} tipo={alerta.tipo} mensagem={alerta.mensagem}/>
+            <form ref={formRef} className="form" encType='multipart/form-data' onSubmit={handleSubmit}>
                 <FotoVisitante foto={resultadoBusca.id ? resultadoBusca.foto : ""} editavel={editavel}/>
                 <div className="form-wrapper">
                     <div className="width--95">
