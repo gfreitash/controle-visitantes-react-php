@@ -12,7 +12,7 @@ class JwtHelper
 {
     private const ALGORITMO = "HS256";
     private const TEMPO_VIDA_ACCESS_TOKEN = 60 * 3; // 3 minutos
-    private const TEMPO_VIDA_REFRESH_TOKEN = 60 * 60 * 1.5; // 1 hora e meia
+    private const TEMPO_VIDA_REFRESH_TOKEN = 60 * 60 * 1.5; // Uma hora e meia
 
     public static function criarAccessToken(array $conteudo): ?string
     {
