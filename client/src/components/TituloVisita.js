@@ -39,7 +39,7 @@ export default function TituloVisita(props) {
 
     const conteudoTitulo = status === "aberta" && (
         <div>
-            <FontAwesomeIcon icon={faPenToSquare} className="fa-2xl me-2 interativo" onClick={props.onEditar}/>
+            <FontAwesomeIcon icon={faPenToSquare} className="fa-2xl me-3 interativo" onClick={props.onEditar}/>
             <FontAwesomeIcon icon={faPersonWalkingDashedLineArrowRight} className="fa-2xl interativo" onClick={props.onFinalizar}/>
         </div>
     )

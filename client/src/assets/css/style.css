@@ -65,6 +65,14 @@ a > svg {
     width: 35%;
 }
 
+.width--40 {
+    width: 40%;
+}
+
+.width--58 {
+    width: 58%;
+}
+
 .width--63 {
     width: 63%
 }

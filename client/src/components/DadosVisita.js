@@ -69,13 +69,13 @@ export default function DadosVisita(props) {
     return (
         <div className="form-linha">
             <div className="form-linha width--80">
-                <Form.Group controlId="salaVisita" className="campo width--33">
+                <Form.Group controlId="salaVisita" className="campo width--40">
                     <Form.Label>Onde vai:</Form.Label>
                     <Form.Control value={form.salaVisita} type="text" name="salaVisita" onChange={handleChange}
                                   disabled={props.disabled} required/>
                 </Form.Group>
 
-                <Form.Group controlId="motivoVisita" className="campo width--65">
+                <Form.Group controlId="motivoVisita" className="campo width--58">
                     <Form.Label>Motivo da visita:</Form.Label>
                     <Form.Control value={form.motivoVisita} type="text" name="motivoVisita" onChange={handleChange}
                                   disabled={props.disabled}/>
