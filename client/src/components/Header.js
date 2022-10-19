@@ -53,14 +53,14 @@ export default function Header(props) {
                                     <NavDropdown.Item>Cadastrar nova visita</NavDropdown.Item>
                                 </LinkContainer>
                                 <LinkContainer to="/lista-visitas/todas">
-                                    <NavDropdown.Item>Todas as visitas</NavDropdown.Item>
+                                    <NavDropdown.Item>Lista de todas as visitas</NavDropdown.Item>
                                 </LinkContainer>
                                 <NavDropdown.Divider/>
                                 <LinkContainer to="/lista-visitas/abertas">
-                                    <NavDropdown.Item>Visitas em aberto</NavDropdown.Item>
+                                    <NavDropdown.Item>Lista de visitas abertas</NavDropdown.Item>
                                 </LinkContainer>
                                 <LinkContainer to="/lista-visitas/fechadas">
-                                    <NavDropdown.Item>Visitas finalizadas</NavDropdown.Item>
+                                    <NavDropdown.Item>Lista de visitas finalizadas</NavDropdown.Item>
                                 </LinkContainer>
                             </NavDropdown>
 

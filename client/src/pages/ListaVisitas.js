@@ -1,21 +1,24 @@
 import React, {useState} from "react";
-import ListaItens, {TableData, TableHeader} from "../components/ListaItens";
+import {Link, useParams} from "react-router-dom";
+
+import useInvalidSessionHandler from "../hooks/useInvalidSessionHandler";
+import useAuth from "../hooks/useAuth";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
+import {ProvedorLista} from "../context/ProvedorLista";
+
+import {Modal} from "react-bootstrap";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {
     faBuildingUser, faLock,
     faPenToSquare,
     faPersonWalking,
     faPersonWalkingDashedLineArrowRight
 } from "@fortawesome/free-solid-svg-icons";
+
 import {mascaraCPF} from "../assets/js/modules/dados-visitante";
-import {Link, useParams} from "react-router-dom";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import Titulo from "../components/Titulo";
-import {ProvedorLista} from "../context/ProvedorLista";
-import {Modal} from "react-bootstrap";
-import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import Alerta from "../components/Alerta";
-import useInvalidSessionHandler from "../hooks/useInvalidSessionHandler";
-import useAuth from "../hooks/useAuth";
+import ListaItens, {TableData, TableHeader} from "../components/ListaItens";
 
 export default function ListaVisitas() {
     const axios = useAxiosPrivate();
@@ -32,6 +35,19 @@ export default function ListaVisitas() {
     const [exibirModal, setExibirModal] = useState(false);
     const [objetoModal, setObjetoModal] = useState({});
     const [alerta, setAlerta] = useState({tipo: "", mensagem: ""});
+
+    const titulo = (id) => {
+        switch (id) {
+            case "abertas":
+                return "Lista de visitas abertas";
+            case "fechadas":
+                return "Lista de visitas finalizadas";
+            case "todas":
+                return "Lista de todas as visitas";
+            default:
+                return "Visitas";
+        }
+    }
 
     const handleAbrirModal = (visita) => {
         return () => {
@@ -111,7 +127,7 @@ export default function ListaVisitas() {
                 <Modal.Title>Finalizar visita</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <p>Tem certeza que deseja finalizar a visita de número {objetoModal.id}?</p>
+                <p>Tem certeza que deseja finalizar a visita de número <b>{objetoModal.id}</b>?</p>
                 <hr/>
                 <p><b>Visitante:</b> {objetoModal.nome} <br/>
                     <b>CPF:</b> {objetoModal.cpf ? mascaraCPF(objetoModal.cpf) : ""} <br/>
@@ -181,7 +197,7 @@ export default function ListaVisitas() {
 
     return (
         <>
-            <Titulo>Lista de Visitas</Titulo>
+            <Titulo>{titulo(id)}</Titulo>
             <hr/>
             <Alerta alerta={alerta} setAlerta={setAlerta}/>
             <ProvedorLista>
