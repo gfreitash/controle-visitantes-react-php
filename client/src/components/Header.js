@@ -1,15 +1,18 @@
-import React from "react";
+import React, {useState} from "react";
 import {Nav, Navbar, NavDropdown} from "react-bootstrap";
 
 import logo from "../assets/imgs/logo-light.png";
 import {LinkContainer} from "react-router-bootstrap";
 import useInvalidSessionHandler from "../hooks/useInvalidSessionHandler";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
+import ModalRelatorioVisitas, {emitirRelatorioVisita} from "../pages/ModalRelatorioVisitas";
 
 export default function Header(props) {
     const LOGOUT_URL = "/logout"
     const axiosPrivate = useAxiosPrivate();
     const handleInvalidSession = useInvalidSessionHandler();
+
+    const [exibirModalRelVisita, setExibirModalRelVisita] = useState(false)
 
     const handleLogout = async () => {
         try {
@@ -20,6 +23,21 @@ export default function Header(props) {
             }
         } catch (err) {
             handleInvalidSession();
+        }
+    }
+
+    const handleRelVisitasDia = async () => {
+        const data = (new Date()).toISOString().split('T')[0];
+        console.log(data);
+        const args = {
+            axios: axiosPrivate,
+            dataInicio: data,
+            dataFim: data
+        }
+        try {
+            await emitirRelatorioVisita(args);
+        } catch (error) {
+
         }
     }
 
@@ -72,12 +90,12 @@ export default function Header(props) {
                                     <NavDropdown.Item>Relatório de visitantes do dia</NavDropdown.Item>
                                 </LinkContainer>
                                 <NavDropdown.Divider/>
-                                <LinkContainer to="/relatorio-visitas">
-                                    <NavDropdown.Item>Relatório de visitas</NavDropdown.Item>
-                                </LinkContainer>
-                                <LinkContainer to="/relatorio-visitas">
-                                    <NavDropdown.Item>Relatório de visitas do dia</NavDropdown.Item>
-                                </LinkContainer>
+                                <NavDropdown.Item onClick={()=>setExibirModalRelVisita(true)}>
+                                    Relatório de visitas
+                                </NavDropdown.Item>
+                                <NavDropdown.Item onClick={handleRelVisitasDia}>
+                                    Relatório de visitas do dia
+                                </NavDropdown.Item>
                             </NavDropdown>
                         </Nav>
                     </Navbar.Collapse>
@@ -95,6 +113,12 @@ export default function Header(props) {
                     </Nav>
                 </div>
             </Navbar>
+            {exibirModalRelVisita &&
+                <ModalRelatorioVisitas
+                    exibir={exibirModalRelVisita}
+                    onFechar={setExibirModalRelVisita}
+                />
+            }
         </header>
     )
 }
