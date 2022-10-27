@@ -84,7 +84,7 @@ export default function NovoCadastro() {
             <hr/>
             <Alerta alerta={alerta} setAlerta={setAlerta} alertaRef={alertaRef}/>
             <form className="needs-validation" id='formContato' encType='multipart/form-data' noValidate
-            onSubmit={handleSubmit}>
+                  onSubmit={handleSubmit}>
                 <section className="form">
                     <FotoVisitante editavel={buscaRealizada && !visitanteEncontrado}
                                    foto={visitanteEncontrado?.id ? visitanteEncontrado.foto : ""}/>
@@ -103,10 +103,21 @@ export default function NovoCadastro() {
                             Cancelar
                         </button>
                     </Link>
-                    <button type="submit" id="botao-2" className="btn btn-primary btn-acao"
-                            disabled={!buscaRealizada || visitanteEncontrado}>
-                        Cadastrar
-                    </button>
+                    {
+                        visitanteEncontrado.cpf
+                            ? (
+                                <Link to={`/nova-visita?cpf=${visitanteEncontrado?.cpf}`}>
+                                    <button type="button" className="btn btn-dark btn-acao">
+                                        Nova Visita
+                                    </button>
+                                </Link>
+                            ) : (
+                                <button type="submit" id="botao-2" className="btn btn-primary btn-acao"
+                                        disabled={!buscaRealizada}>
+                                    Cadastrar
+                                </button>
+                            )
+                    }
                 </div>
             </form>
         </div>
