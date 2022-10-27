@@ -11,6 +11,7 @@ use App\Visitantes\Models\DadosVisitante;
 use App\Visitantes\Models\ParametroBusca;
 use App\Visitantes\Models\RespostaJson;
 use App\Visitantes\Models\Visita;
+use App\Visitantes\Repositories\RepositorioVisitantePDO;
 use App\Visitantes\Repositories\RepositorioVisitaPDO;
 use Nyholm\Psr7\Response;
 use PhpOffice\PhpSpreadsheet\Exception;
@@ -43,8 +44,7 @@ class ControladorRelatorio extends ControladorRest
         if ($dados['relatorio'] === 'visitas') {
             return $this->obterRelatorioVisitas($dados);
         } elseif ($dados['relatorio'] === 'visitantes') {
-            return $this->_501;
-            //TODO return $this->obterRelatorioVisitantes($dados);
+            return $this->obterRelatorioVisitantes($dados);
         } else {
             return new RespostaJson(400, json_encode(['error' => 'Relatório inválido']));
         }
@@ -74,8 +74,8 @@ class ControladorRelatorio extends ControladorRest
         }
 
         $status = $dados['status'] === 'abertas' ? Visita::STATUS[1] : "";
-        $inicio = Utils::tentarCriarDateTime($dados['dataInicio']);
-        $fim = Utils::tentarCriarDateTime($dados['dataFim']);
+        $inicio = Utils::tentarCriarDateTime($dados['dataInicio'] ?? null);
+        $fim = Utils::tentarCriarDateTime($dados['dataFim'] ?? null);
         $cpf = $dados['cpf'] ?? "";
 
         if ($cpf && DadosVisitante::validarCPF($cpf)) {
@@ -95,47 +95,54 @@ class ControladorRelatorio extends ControladorRest
             );
         }
 
-        try {
-            $spreadsheet = new Spreadsheet();
-            $spreadsheet->getDefaultStyle()->getFont()->setName('Calibri')->setSize(11);
-            $sheet = $spreadsheet->getActiveSheet();
-            @$this->configurarEstilosPlanilhaVisitas($sheet, $visitas);
+        return $this->emitirRelatorio(
+            $this->preencherPlanilhaVisita(...),
+            $visitas,
+            'Relatório de Visitas',
+            $this->estilizarPlanilha(...)
+        );
+    }
 
-            //Salvar
-            ob_clean();
-            ob_start();
-            $data = (new \DateTime())->format('Y.m.d H-i-s');
-            $nomeArquivo = "Relatório de Visitas ($data).xlsx";
-            $arquivo = fopen("../tmp/$nomeArquivo", 'w');
-            $writer = new Xlsx($spreadsheet);
-            $writer->save($arquivo);
-            fclose($arquivo);
-
-            $tamanho = filesize("../tmp/$nomeArquivo");
-            readfile("../tmp/$nomeArquivo");
-            unlink("../tmp/$nomeArquivo");
-            return new Response(200, [
-                'Content-Type' => 'application/application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                'Content-Disposition' => 'attachment; filename='.rawurlencode($nomeArquivo),
-                'Content-Length' => $tamanho,
-                'Expires' => '0',
-                'Cache-Control' => 'must-revalidate',
-                'Pragma' => 'public',
-            ]);
-        } catch (\Exception $e) {
-            return new RespostaJson(500, json_encode(['error' => $e->getMessage()]));
+    public function obterRelatorioVisitantes(array $dados): Response
+    {
+        $statusValidos = ['ativos', 'cadastrados'];
+        if (!empty($dados['status']) && !in_array($dados['status'], $statusValidos)) {
+            return new RespostaJson(400, json_encode(['erro' => 'Status inválido']));
         }
+
+        $status = $dados['status'] ?? $statusValidos[1];
+        $inicio = Utils::tentarCriarDateTime($dados['dataInicio'] ?? null);
+        $fim = Utils::tentarCriarDateTime($dados['dataFim'] ?? null);
+        $parametros = new ParametroBusca(RepositorioVisitantePDO::BUSCAR_POR, dataInicio: $inicio, dataFim: $fim);
+
+        if ($status === 'ativos') {
+            $visitantes = $this->repositorioVisita->obterVisitantesAtivos($parametros);
+        } else { //$status === 'cadastrados'
+            $visitantes = $this->repositorioVisitante->buscarTodosVisitantes($parametros);
+        }
+
+        return $this->emitirRelatorio(
+            $this->preencherPlanilhaVisitante(...),
+            $visitantes,
+            'Relatório de Visitantes'
+        );
     }
 
     /**
      * @throws Exception
      */
-    private function configurarEstilosPlanilhaVisitas(Worksheet $sheet, array $visitas): void
+    private function estilizarPlanilha(Worksheet $sheet, string $titulo, int $qtdColunas, int $qtdItens)
     {
+        $col = 'a';
+        for ($i = 0; $i < $qtdColunas-1; $i++) {
+            $col++;
+        }
+        $linhaInicial = 3;
+        $linhaFinal = $linhaInicial + $qtdItens - 1;
 
         //Titulo
-        $sheet->setCellValue('A1', 'Relatório de visitas');
-        $sheet->mergeCells('A1:O1');
+        $sheet->setCellValue('A1', $titulo);
+        $sheet->mergeCells("A1:{$col}1");
         $sheet->getStyle('A1')->getFont()->setSize(24);
         $sheet->getStyle('A1')->getAlignment()->setHorizontal('center');
         $sheet->getStyle('A1')->getAlignment()->setVertical('center');
@@ -143,9 +150,53 @@ class ControladorRelatorio extends ControladorRest
         $sheet->getStyle('A1')->getFill()->setFillType('solid')->getStartColor()->setRGB('8ea9db');
         $sheet->getStyle('A1')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_MEDIUM);
 
+        //Cabeçalho
+        $coordCabecalho = "A2:{$col}2";
+        $sheet->getStyle($coordCabecalho)->getFont()->setBold(true);
+        $sheet->getStyle($coordCabecalho)->getFill()->setFillType('solid')->getStartColor()->setRGB('b4c6e7');
+        $sheet->getStyle($coordCabecalho)->getBorders()->getOutline()->setBorderStyle(Border::BORDER_MEDIUM);
+        $sheet->getStyle($coordCabecalho)->getBorders()->getInside()->setBorderStyle(Border::BORDER_THIN);
+        $sheet->getStyle($coordCabecalho)->getAlignment()->setWrapText(true);
+        $sheet->getRowDimension('2')->setRowHeight(34);
+
+        //AutoFilter
+        $coordDados = "A2:$col$linhaFinal";
+        $sheet->setAutoFilter($coordDados);
+        //Estilos
+        $coordDados = "A$linhaInicial:$col$linhaFinal";
+        $sheet->getStyle($coordDados)->getBorders()->getOutline()->setBorderStyle(Border::BORDER_MEDIUM);
+        $sheet->getStyle($coordDados)->getBorders()->getInside()->setBorderStyle(Border::BORDER_THIN);
+        $sheet->getStyle($coordDados)->getAlignment()->setWrapText(true);
+
+        //Adicionar listras independentemente das linhas visíveis
+        /** @var Wizard\Expression $wizardLighter */
+        $wizardLighter = (new Wizard($coordDados))->newRule(Wizard::EXPRESSION);
+        $lightStyle = new Style(false, true);
+        $lightStyle->getFill()->setFillType(Fill::FILL_SOLID)->getEndColor()->setARGB("FFF2F2F2");
+        $wizardLighter->expression('MOD(SUBTOTAL(3,$A$3:$A3),2)=0')->setStyle($lightStyle);
+        /** @var Wizard\Expression $wizardDarker */
+        $wizardDarker = (new Wizard($coordDados))->newRule(Wizard::EXPRESSION);
+        $darkStyle = new Style(false, true);
+        $darkStyle->getFill()->setFillType(Fill::FILL_SOLID)->getEndColor()->setARGB("FFD9D9D9");
+        $wizardDarker->expression('MOD(SUBTOTAL(3,$A$3:$A3),2)=1')->setStyle($darkStyle);
+
+        $condicoes = [$wizardLighter->getConditional(), $wizardDarker->getConditional()];
+        $sheet->getStyle($coordDados)->setConditionalStyles($condicoes);
+
+        //Finalmente, definir a célula ativa
+        $sheet->setSelectedCell("A1");
+    }
+
+    /**
+     * @param Worksheet $sheet
+     * @param array $visitas
+     * @return int Quantidade de colunas
+     */
+    private function preencherPlanilhaVisita(Worksheet $sheet, array $visitas): int
+    {
         //Cabecalho
         $sheet->getRowDimension('2')->setRowHeight(34);
-        $sheet->setCellValue('A2', 'Nº da Visita');
+        $sheet->setCellValue('A2', 'ID');
         $sheet->getColumnDimension('A')->setWidth(11);
         $sheet->setCellValue('B2', 'CPF');
         $sheet->getColumnDimension('B')->setWidth(15);
@@ -176,101 +227,183 @@ class ControladorRelatorio extends ControladorRest
         $sheet->setCellValue('O2', 'Finalizada Por');
         $sheet->getColumnDimension('O')->setWidth(21);
 
-        $coordCabecalho = 'A2:O2';
-        $sheet->getStyle($coordCabecalho)->getFont()->setBold(true);
-        $sheet->getStyle($coordCabecalho)->getFill()->setFillType('solid')->getStartColor()->setRGB('b4c6e7');
-        $sheet->getStyle($coordCabecalho)->getBorders()->getOutline()->setBorderStyle(Border::BORDER_MEDIUM);
-        $sheet->getStyle($coordCabecalho)->getBorders()->getInside()->setBorderStyle(Border::BORDER_THIN);
-        $sheet->getStyle($coordCabecalho)->getAlignment()->setWrapText(true);
-
         //Dados
         $linhaInicial = 3;
         $qtdLinhas = count($visitas);
         for ($i = 0; $i < $qtdLinhas; $i++) {
             $row = $linhaInicial + $i;
+            $visita = $visitas[$i];
             $visitante = $this->repositorioVisitante->buscarPorCpf($visitas[$i]->cpf);
-            $visitante = $visitante ? $visitante->paraArray() : [];
+            if (!$visitante) {
+                continue;
+            }
+            $visitante = (object) $visitante->paraArray();
 
-            $cadastradaPor = $this->repositorioUsuario
-                ->buscarPorId($visitas[$i]->cadastrada_por)
+            $cadastradaPor = (object) $this->repositorioUsuario
+                ->buscarPorId($visita->cadastrada_por)
                 ->paraArray();
-            $modificadaPor = $visitas[$i]->modificada_por ? $this->repositorioUsuario
-                ->buscarPorId($visitas[$i]->modificada_por)
-                ->paraArray() : [];
-            $finalizadaPor = $visitas[$i]->finalizada_por ? $this->repositorioUsuario
-                ->buscarPorId($visitas[$i]->finalizada_por)
-                ->paraArray() : [];
+            $modificadaPor = $visita->modificada_por ? (object) $this->repositorioUsuario
+                ->buscarPorId($visita->modificada_por)
+                ->paraArray() : null;
+            $finalizadaPor = $visita->finalizada_por ? (object) $this->repositorioUsuario
+                ->buscarPorId($visita->finalizada_por)
+                ->paraArray() : null;
 
             $dataNascimento = Utils::formatarData(
-                $visitante['data_nascimento'],
+                $visitante?->data_nascimento,
                 Utils::FORMATOS_DATA['date'],
                 Utils::FORMATOS_DATA['date_local']
             );
             $dataVisita = Utils::formatarData(
-                $visitas[$i]->data_visita,
+                $visita->data_visita,
                 Utils::FORMATOS_DATA['datetime'],
                 Utils::FORMATOS_DATA['datetime_local']
             );
             $dataModificada = Utils::formatarData(
-                $visitas[$i]->modificada_em,
+                $visita->modificada_em,
                 Utils::FORMATOS_DATA['datetime'],
                 Utils::FORMATOS_DATA['datetime_local']
             );
             $dataFinalizada = Utils::formatarData(
-                $visitas[$i]->finalizada_em,
+                $visita->finalizada_em,
                 Utils::FORMATOS_DATA['datetime'],
                 Utils::FORMATOS_DATA['datetime_local']
             );
 
-            $sheet->setCellValue("A$row", $visitas[$i]->id);
-            $sheet->setCellValue("B$row", DadosVisitante::mascaraCpf($visitas[$i]->cpf));
-            $sheet->setCellValue("C$row", $visitante['nome']);
+            $sheet->setCellValue("A$row", $visita->id);
+            $sheet->setCellValue("B$row", DadosVisitante::mascaraCpf($visitante?->cpf));
+            $sheet->setCellValue("C$row", $visitante?->nome);
             $sheet->setCellValue("D$row", $dataNascimento);
-            $sheet->setCellValue("E$row", Utils::seNuloRetornarVazio($visitante['identidade']));
-            $sheet->setCellValue("F$row", Utils::seNuloRetornarVazio($visitante['expedidor']));
-            $sheet->setCellValue("G$row", $visitas[$i]->sala_visita);
-            $sheet->setCellValue("H$row", $visitas[$i]->motivo_visita);
+            $sheet->setCellValue("E$row", Utils::seNuloRetornarVazio($visitante?->identidade));
+            $sheet->setCellValue("F$row", Utils::seNuloRetornarVazio($visitante?->expedidor));
+            $sheet->setCellValue("G$row", $visita->sala_visita);
+            $sheet->setCellValue("H$row", $visita->motivo_visita);
             $sheet->setCellValue("I$row", $dataVisita);
-            $sheet->setCellValue("J$row", $visitas[$i]->foi_liberado ? 'Sim' : 'Não');
-            $sheet->setCellValue("K$row", $cadastradaPor['nome']);
+            $sheet->setCellValue("J$row", $visita->foi_liberado ? 'Sim' : 'Não');
+            $sheet->setCellValue("K$row", $cadastradaPor->nome);
             $sheet->setCellValue("L$row", $dataModificada);
-            $sheet->setCellValue("M$row", Utils::seNuloRetornarVazio($modificadaPor['nome']));
+            $sheet->setCellValue("M$row", Utils::seNuloRetornarVazio($modificadaPor?->nome));
             $sheet->setCellValue("N$row", $dataFinalizada);
-            $sheet->setCellValue("O$row", Utils::seNuloRetornarVazio($finalizadaPor['nome']));
+            $sheet->setCellValue("O$row", Utils::seNuloRetornarVazio($finalizadaPor?->nome));
         }
 
-        //AutoFilter
-        $linhaFinal = $linhaInicial + $qtdLinhas - 1;
-        trigger_error("Linha Final: $linhaFinal");
-        $coordDados = "A2:O$linhaFinal";
-        $sheet->setAutoFilter($coordDados);
-        //Estilos
-        $coordDados = "A$linhaInicial:O$linhaFinal";
-        $sheet->getStyle($coordDados)->getBorders()->getOutline()->setBorderStyle(Border::BORDER_MEDIUM);
-        $sheet->getStyle($coordDados)->getBorders()->getInside()->setBorderStyle(Border::BORDER_THIN);
-        $sheet->getStyle($coordDados)->getAlignment()->setWrapText(true);
-
-        //Adicionar listras independentemente das linhas visíveis
-        /** @var Wizard\Expression $wizardLighter */
-        $wizardLighter = (new Wizard($coordDados))->newRule(Wizard::EXPRESSION);
-        $lightStyle = new Style(false, false);
-        $lightStyle->getFill()->setFillType(Fill::FILL_SOLID)->getEndColor()->setARGB("FFF2F2F2");
-        $wizardLighter->expression('MOD(SUBTOTAL(3,$A$3:$A3),2)=0')->setStyle($lightStyle);
-        /** @var Wizard\Expression $wizardDarker */
-        $wizardDarker = (new Wizard($coordDados))->newRule(Wizard::EXPRESSION);
-        $darkStyle = new Style(false, true);
-        $darkStyle->getFill()->setFillType(Fill::FILL_SOLID)->getEndColor()->setARGB("FFD9D9D9");
-        $wizardDarker->expression('MOD(SUBTOTAL(3,$A$3:$A3),2)=1')->setStyle($darkStyle);
-
-        $condicoes = [$wizardLighter->getConditional(), $wizardDarker->getConditional()];
-        $sheet->getStyle($coordDados)->setConditionalStyles($condicoes);
-
-        //Finalmente, definir a célula ativa
-        $sheet->setSelectedCell("A1");
+        return 15;
     }
 
-    public function obterRelatorioVisitantes(array $dados)
+    /**
+     * @param Worksheet $sheet
+     * @param array $visitantes
+     * @return int Quantidade de colunas
+     */
+    private function preencherPlanilhaVisitante(Worksheet $sheet, array $visitantes): int
     {
-        //TODO - Implementar
+        //Cabeçalho
+        $sheet->getRowDimension('2')->setRowHeight(34);
+        $sheet->setCellValue('A2', 'Nº da Visita');
+        $sheet->getColumnDimension('A')->setWidth(11);
+        $sheet->setCellValue('B2', 'CPF');
+        $sheet->getColumnDimension('B')->setWidth(15);
+        $sheet->setCellValue('C2', 'Nome');
+        $sheet->getColumnDimension('C')->setWidth(32);
+        $sheet->setCellValue('D2', 'Data de Nascimento');
+        $sheet->getColumnDimension('D')->setWidth(13);
+        $sheet->setCellValue('E2', 'Identidade');
+        $sheet->getColumnDimension('E')->setWidth(13);
+        $sheet->setCellValue('F2', 'Expedidor');
+        $sheet->getColumnDimension('F')->setWidth(12);
+        $sheet->setCellValue('G2', 'Cadastrado Em');
+        $sheet->getColumnDimension('G')->setWidth(19);
+        $sheet->setCellValue('H2', 'Cadastrado Por');
+        $sheet->getColumnDimension('H')->setWidth(21);
+        $sheet->setCellValue('I2', 'Modificado Em');
+        $sheet->getColumnDimension('I')->setWidth(19);
+        $sheet->setCellValue('J2', 'Modificado Por');
+        $sheet->getColumnDimension('J')->setWidth(21);
+
+        //Dados
+        $linhaInicial = 3;
+        $qtdLinhas = count($visitantes);
+        for ($i = 0; $i < $qtdLinhas; $i++) {
+            $row = $linhaInicial + $i;
+            $visitante = $visitantes[$i];
+
+            $cadastradoPor = (object) $this->repositorioUsuario
+                ->buscarPorId($visitante->cadastrado_por)
+                ->paraArray();
+            $modificadoPor = $visitante->modificado_por ? (object) $this->repositorioUsuario
+                ->buscarPorId($visitante->modificado_por)
+                ->paraArray() : null;
+
+            $dataNascimento = Utils::formatarData(
+                $visitante->data_nascimento,
+                Utils::FORMATOS_DATA['date'],
+                Utils::FORMATOS_DATA['date_local']
+            );
+            $dataCadastrado = Utils::formatarData(
+                $visitante->cadastrado_em,
+                Utils::FORMATOS_DATA['datetime'],
+                Utils::FORMATOS_DATA['datetime_local']
+            );
+            $dataModificado = Utils::formatarData(
+                $visitante->modificado_em,
+                Utils::FORMATOS_DATA['datetime'],
+                Utils::FORMATOS_DATA['datetime_local']
+            );
+
+            $sheet->setCellValue("A$row", $visitante->id);
+            $sheet->setCellValue("B$row", DadosVisitante::mascaraCpf($visitante->cpf));
+            $sheet->setCellValue("C$row", $visitante->nome);
+            $sheet->setCellValue("D$row", $dataNascimento);
+            $sheet->setCellValue("E$row", Utils::seNuloRetornarVazio($visitante->identidade));
+            $sheet->setCellValue("F$row", Utils::seNuloRetornarVazio($visitante->expedidor));
+            $sheet->setCellValue("G$row", $dataCadastrado);
+            $sheet->setCellValue("H$row", $cadastradoPor->nome);
+            $sheet->setCellValue("I$row", $dataModificado);
+            $sheet->setCellValue("J$row", Utils::seNuloRetornarVazio($modificadoPor?->nome));
+        }
+
+        return 10;
+    }
+
+    private function emitirRelatorio(
+        callable $preencherDados,
+        array $lista,
+        string $nomeArquivo
+    ): Response
+    {
+        try {
+            $spreadsheet = new Spreadsheet();
+            $spreadsheet->getDefaultStyle()->getFont()->setName('Calibri')->setSize(11);
+            $sheet = $spreadsheet->getActiveSheet();
+
+            $qtdColunas = $preencherDados($sheet, $lista);
+            $qtdLinhas = count($lista);
+            $this->estilizarPlanilha($sheet, $nomeArquivo, $qtdColunas, $qtdLinhas);
+
+            //Salvar
+            ob_clean();
+            ob_start();
+            $data = (new \DateTime())->format('Y.m.d H-i-s');
+            $nomeArquivo = "$nomeArquivo ($data).xlsx";
+            $arquivo = fopen("../tmp/$nomeArquivo", 'w');
+            $writer = new Xlsx($spreadsheet);
+            $writer->save($arquivo);
+            fclose($arquivo);
+
+            $tamanho = filesize("../tmp/$nomeArquivo");
+            readfile("../tmp/$nomeArquivo");
+            unlink("../tmp/$nomeArquivo");
+
+            return new Response(200, [
+                'Content-Type' => 'application/application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'Content-Disposition' => 'attachment; filename='.rawurlencode($nomeArquivo),
+                'Content-Length' => $tamanho,
+                'Expires' => '0',
+                'Cache-Control' => 'must-revalidate',
+                'Pragma' => 'public',
+            ]);
+        } catch (\Exception $e) {
+            return new RespostaJson(500, json_encode(['error' => $e->getMessage()]));
+        }
     }
 }

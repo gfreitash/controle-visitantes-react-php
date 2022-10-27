@@ -173,6 +173,28 @@ class RepositorioVisitaPDO extends JoinableDataLayer implements RepositorioVisit
         return $this->count() ? array_map(fn($rs) => $rs->data(), $resultado) : [];
     }
 
+    public function obterVisitantesAtivos(?ParametroBusca $parametros = null): array
+    {
+        $repVisitante = RepositorioVisitantePDO::obterRepositorioVisitante();
+        $entidadeVisitante = $repVisitante->getEntity();
+        $colunas = "$entidadeVisitante.*";
+
+        [$where, $params] = $this->definirDetalhesBusca($parametros);
+        $this->group("$entidadeVisitante.id");
+
+        $this->findWithJoin(
+            $entidadeVisitante,
+            "id",
+            "visitante_id",
+            $where,
+            $params,
+            $colunas
+        );
+        $resultado = $this->fetch(true);
+        return $this->count() ? array_map(fn($rs) => $rs->data(), $resultado) : [];
+    }
+
+
     public function obterTotalVisitas(?string $status = ""): int
     {
         $conexao = Conexao::criarConexao();
@@ -246,7 +268,7 @@ class RepositorioVisitaPDO extends JoinableDataLayer implements RepositorioVisit
     private function definirDetalhesBusca(?ParametroBusca $parametros = null, $where = "", $params = ""): array
     {
         if ($parametros?->ordenarPor) {
-            $this->order(Utils::arrayParaString($parametros->ordenarPor));
+            $this->order(Utils::arrayOrdenacaoParaString($parametros->ordenarPor));
         }
         if ($parametros?->limite) {
             $this->limit($parametros->limite);
@@ -255,6 +277,10 @@ class RepositorioVisitaPDO extends JoinableDataLayer implements RepositorioVisit
             $this->offset($parametros->offset);
         }
         if ($parametros?->dataInicio) {
+            if (strlen($where > 0)) {
+                $where .= " AND ";
+            }
+
             $where .= "data_visita >= :dataInicio";
             $params .=  strlen($params) > 0 ? "&" : "";
             $params .= "dataInicio={$parametros->dataInicio->format(Utils::FORMATOS_DATA['date'])}";
@@ -263,6 +289,7 @@ class RepositorioVisitaPDO extends JoinableDataLayer implements RepositorioVisit
             if (strlen($where > 0)) {
                 $where .= " AND ";
             }
+
             $where .= "data_visita <= :dataFim";
             $params .=  strlen($params) > 0 ? "&" : "";
             $params .= "dataFim={$parametros->dataFim->format(Utils::FORMATOS_DATA['date'])}";

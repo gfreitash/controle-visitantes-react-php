@@ -132,7 +132,7 @@ class RepositorioVisitantePDO extends JoinableDataLayer implements RepositorioVi
         $params = "";
 
         if ($parametros?->ordenarPor) {
-            $this->order(Utils::arrayParaString($parametros->ordenarPor));
+            $this->order(Utils::arrayOrdenacaoParaString($parametros->ordenarPor));
         }
         if ($parametros?->limite) {
             $this->limit($parametros->limite);
@@ -141,14 +141,21 @@ class RepositorioVisitantePDO extends JoinableDataLayer implements RepositorioVi
             $this->offset($parametros->offset);
         }
         if ($parametros?->dataInicio) {
+            if (strlen($where) > 0) {
+                $where .= " AND ";
+            }
+
             $where .= "cadastrado_em >= :dataInicio";
             $params .=  strlen($params) > 0 ? "&" : "";
-            $params .= "dataInicio={$parametros->dataInicio}";
+            $params .= "dataInicio={$parametros->dataInicio->format(Utils::FORMATOS_DATA['date'])}";
         }
         if ($parametros?->dataFim) {
+            if (strlen($where) > 0) {
+                $where .= " AND ";
+            }
             $where .= "cadastrado_em <= :dataFim";
             $params .=  strlen($params) > 0 ? "&" : "";
-            $params .= "dataFim={$parametros->dataFim}";
+            $params .= "dataFim={$parametros->dataFim->format(Utils::FORMATOS_DATA['date'])}";
         }
 
         return [$where, $params];

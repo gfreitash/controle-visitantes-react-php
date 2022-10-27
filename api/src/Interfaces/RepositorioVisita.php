@@ -27,6 +27,8 @@ interface RepositorioVisita
         ParametroBusca $parametros=null
     ): array;
 
+    public function obterVisitantesAtivos(?ParametroBusca $parametros = null): array;
+
     public function obterTotalVisitas(?string $status=""): int;
 
     public static function obterRepositorioVisita(): RepositorioVisita;

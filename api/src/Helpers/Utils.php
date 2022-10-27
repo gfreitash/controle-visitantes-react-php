@@ -13,7 +13,7 @@ class Utils
             'datetime_local_curto' => 'd/m/Y H:i',
             'date_local' => 'd/m/Y'];
 
-    public static function arrayParaString(array $arrayAssoc): string
+    public static function arrayOrdenacaoParaString(array $arrayAssoc): string
     {
         $append = "";
         foreach ($arrayAssoc as $chave => $valor) {
