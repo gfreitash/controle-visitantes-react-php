@@ -5,14 +5,16 @@ import logo from "../assets/imgs/logo-light.png";
 import {LinkContainer} from "react-router-bootstrap";
 import useInvalidSessionHandler from "../hooks/useInvalidSessionHandler";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
-import ModalRelatorioVisitas, {emitirRelatorioVisita} from "../pages/ModalRelatorioVisitas";
+import ModalRelatorioVisitas, {emitirRelatorioVisita} from "./ModalRelatorioVisitas";
+import ModalRelatorioVisitante, {emitirRelatorioVisitante} from "./ModalRelatorioVisitante";
 
 export default function Header(props) {
     const LOGOUT_URL = "/logout"
     const axiosPrivate = useAxiosPrivate();
     const handleInvalidSession = useInvalidSessionHandler();
 
-    const [exibirModalRelVisita, setExibirModalRelVisita] = useState(false)
+    const [exibirModalRelVisita, setExibirModalRelVisita] = useState(false);
+    const [exibirModalRelVisitante, setExibirModalRelVisitante] = useState(false);
 
     const handleLogout = async () => {
         try {
@@ -26,18 +28,20 @@ export default function Header(props) {
         }
     }
 
-    const handleRelVisitasDia = async () => {
+    const handleEmitirRelDia = async (funcaoEmissao) => {
         const data = (new Date()).toISOString().split('T')[0];
-        console.log(data);
+
         const args = {
             axios: axiosPrivate,
             dataInicio: data,
             dataFim: data
         }
         try {
-            await emitirRelatorioVisita(args);
+            await funcaoEmissao(args);
         } catch (error) {
-
+            if (error.response.status === 401) {
+                handleInvalidSession(error);
+            }
         }
     }
 
@@ -83,17 +87,19 @@ export default function Header(props) {
                             </NavDropdown>
 
                             <NavDropdown title="Relatórios" id="basic-nav-dropdown">
-                                <LinkContainer to="/relatorio-visitantes">
-                                    <NavDropdown.Item>Relatório de visitantes</NavDropdown.Item>
-                                </LinkContainer>
-                                <LinkContainer to="/relatorio-visitantes">
-                                    <NavDropdown.Item>Relatório de visitantes do dia</NavDropdown.Item>
-                                </LinkContainer>
+                                <NavDropdown.Item onClick={()=>setExibirModalRelVisitante(true)}>
+                                    Relatório de visitantes
+                                </NavDropdown.Item>
+                                <NavDropdown.Item onClick={()=>handleEmitirRelDia(emitirRelatorioVisitante)}>
+                                    Relatório de visitantes do dia
+                                </NavDropdown.Item>
+
                                 <NavDropdown.Divider/>
+
                                 <NavDropdown.Item onClick={()=>setExibirModalRelVisita(true)}>
                                     Relatório de visitas
                                 </NavDropdown.Item>
-                                <NavDropdown.Item onClick={handleRelVisitasDia}>
+                                <NavDropdown.Item onClick={()=>handleEmitirRelDia(emitirRelatorioVisita)}>
                                     Relatório de visitas do dia
                                 </NavDropdown.Item>
                             </NavDropdown>
@@ -117,6 +123,12 @@ export default function Header(props) {
                 <ModalRelatorioVisitas
                     exibir={exibirModalRelVisita}
                     onFechar={setExibirModalRelVisita}
+                />
+            }
+            {exibirModalRelVisitante &&
+                <ModalRelatorioVisitante
+                    exibir={exibirModalRelVisitante}
+                    onFechar={setExibirModalRelVisitante}
                 />
             }
         </header>

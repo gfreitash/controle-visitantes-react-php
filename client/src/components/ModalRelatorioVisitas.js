@@ -22,11 +22,19 @@ export async function emitirRelatorioVisita({axios, dataInicio, dataFim, cpf, ap
         url += `&dataFim=${dataFim}`;
     }
 
-    const resposta = await axios.get(url, {responseType: "blob"});
-    let nomeArquivo =  resposta.headers['content-disposition'].split("filename=")[1];
-    nomeArquivo = decodeURI(nomeArquivo);
+    try {
+        const resposta = await axios.get(url, {responseType: "blob"});
+        let nomeArquivo =  resposta.headers['content-disposition'].split("filename=")[1];
+        nomeArquivo = decodeURI(nomeArquivo);
 
-    fileDownload(resposta.data, nomeArquivo, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        fileDownload(resposta.data, nomeArquivo, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    } catch (error) {
+        if (error.response.status === 401) {
+            throw error;
+        } else {
+            console.log(error);
+        }
+    }
 }
 
 export default function ModalRelatorioVisitas({exibir, onFechar}) {
@@ -39,7 +47,6 @@ export default function ModalRelatorioVisitas({exibir, onFechar}) {
         visitante: "",
         apenasAbertas: false
     });
-
     const [checks, setChecks] = useState({
         dataInicio: false,
         dataFim: false,
@@ -89,8 +96,7 @@ export default function ModalRelatorioVisitas({exibir, onFechar}) {
             dataFim: checks.dataFim ? form.dataFim : null,
             cpf: cpfValido ? form.visitante : null
         }
-        console.log("Args: ", args);
-        console.log("Form: ", form);
+
         try {
             await emitirRelatorioVisita(args);
             handleFechar();
@@ -114,11 +120,12 @@ export default function ModalRelatorioVisitas({exibir, onFechar}) {
             </Modal.Header>
 
             <Modal.Body>
-                <form className="d-flex align-items-center justify-content-between" id="relatorioVisitas">
+                <section className="d-flex align-items-center justify-content-between" id="relatorioVisitas">
                     <div className="d-flex">
                         <Form.Check name="apenasAbertas" id="apenasAbertas"
                                     checked={form.apenasAbertas} type="checkbox" className="me-2"
-                                    onChange={(event) => setForm({...form, apenasAbertas: event.target.checked})}/>
+                                    onChange={(event) => setForm({...form, apenasAbertas: event.target.checked})}
+                        />
                         <label htmlFor="apenasAbertas">Apenas abertas?</label>
                     </div>
 
@@ -134,6 +141,7 @@ export default function ModalRelatorioVisitas({exibir, onFechar}) {
                                           onChange={(event)=>setForm({...form, dataInicio: event.target.value})}/>
                         </div>
                     </div>
+
                     <div className="d-flex flex-column">
                         <div className="d-flex flex-row">
                             <Form.Check name="dataFimCheck" id="dataFimCheck"
@@ -157,7 +165,7 @@ export default function ModalRelatorioVisitas({exibir, onFechar}) {
                         <Form.Control disabled={!checks.visitante} value={form.visitante}
                                       onChange={handleCpfChange}/>
                     </div>
-                </form>
+                </section>
             </Modal.Body>
 
             <Modal.Footer>

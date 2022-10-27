@@ -16,7 +16,7 @@ import Visitante from "./pages/Visitante";
 import NovaVisita from "./pages/NovaVisita";
 import Visita from "./pages/Visita";
 import ListaVisitas from "./pages/ListaVisitas";
-import ModalRelatorioVisitas from "./pages/ModalRelatorioVisitas";
+import ModalRelatorioVisitas from "./components/ModalRelatorioVisitas";
 
 export default function App() {
     const {auth} = useAuth();
