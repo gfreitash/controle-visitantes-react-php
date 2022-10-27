@@ -88,16 +88,9 @@ class RepositorioVisitantePDO extends JoinableDataLayer implements RepositorioVi
 
     public function buscarTodosVisitantes(ParametroBusca $parametros = null): array
     {
-        $this->find();
-        if ($parametros?->ordenarPor) {
-            $this->order(Utils::arrayParaString($parametros->ordenarPor));
-        }
-        if ($parametros?->limite) {
-            $this->limit($parametros->limite);
-        }
-        if ($parametros?->limite && $parametros?->offset) {
-            $this->offset($parametros->offset);
-        }
+        [$where, $params] = $this->definirDetalhesBusca($parametros);
+        $this->find($where, $params);
+
         $resultado = $this->fetch(true);
         return $this->count() ? array_map(fn($rs) => $rs->data(), $resultado) : [];
     }
@@ -114,15 +107,7 @@ class RepositorioVisitantePDO extends JoinableDataLayer implements RepositorioVi
             $this->find($where, "cpf=$termo&nome=$termo");
         }
 
-        if ($parametros?->ordenarPor) {
-            $this->order(Utils::arrayParaString($parametros?->ordenarPor));
-        }
-        if ($parametros?->limite) {
-            $this->limit($parametros?->limite);
-        }
-        if ($parametros?->limite && $parametros?->offset) {
-            $this->offset($parametros->offset);
-        }
+        $this->definirDetalhesBusca($parametros);
 
         $resultado = $this->fetch(true);
         return $this->count() ? array_map(fn($rs) => $rs->data(), $resultado) : [];
@@ -139,6 +124,34 @@ class RepositorioVisitantePDO extends JoinableDataLayer implements RepositorioVi
         foreach ($propriedades as $propriedade => $valor) {
             $this->$propriedade = $valor;
         }
+    }
+
+    private function definirDetalhesBusca(?ParametroBusca $parametros = null): array
+    {
+        $where = "";
+        $params = "";
+
+        if ($parametros?->ordenarPor) {
+            $this->order(Utils::arrayParaString($parametros->ordenarPor));
+        }
+        if ($parametros?->limite) {
+            $this->limit($parametros->limite);
+        }
+        if ($parametros?->limite && $parametros?->offset) {
+            $this->offset($parametros->offset);
+        }
+        if ($parametros?->dataInicio) {
+            $where .= "cadastrado_em >= :dataInicio";
+            $params .=  strlen($params) > 0 ? "&" : "";
+            $params .= "dataInicio={$parametros->dataInicio}";
+        }
+        if ($parametros?->dataFim) {
+            $where .= "cadastrado_em <= :dataFim";
+            $params .=  strlen($params) > 0 ? "&" : "";
+            $params .= "dataFim={$parametros->dataFim}";
+        }
+
+        return [$where, $params];
     }
 
     private function criarVisitante(DataLayer|array $vs): Visitante

@@ -65,7 +65,7 @@ class RepositorioVisitaPDO extends JoinableDataLayer implements RepositorioVisit
         if ($this->save()) {
             return $this->buscarPorId($this->id);
         }
-        trigger_error($this->fail()->getMessage());
+
         return false;
     }
 
@@ -117,19 +117,17 @@ class RepositorioVisitaPDO extends JoinableDataLayer implements RepositorioVisit
                 $terms .= "$entidadeVisita.finalizada_em IS NULL";
             }
         }
-        if (!empty($parametros?->ordenarPor)) {
-            $this->order(Utils::arrayParaString($parametros->ordenarPor));
-        }
 
-        if ($parametros?->limite > 0) {
-            $this->limit($parametros->limite);
-        }
+        [$where, $params] = $this->definirDetalhesBusca($parametros, $terms);
 
-        if ($parametros?->offset > 0) {
-            $this->offset($parametros->offset);
-        }
-
-        $this->findWithJoin($entidadeVisitante, "id", "visitante_id", $terms, columns: $colunas);
+        $this->findWithJoin(
+            $entidadeVisitante,
+            "id",
+            "visitante_id",
+            $where,
+            $params,
+            $colunas
+        );
         $resultado = $this->fetch(true);
         return $this->count() ? array_map(fn($rs) => $rs->data(), $resultado) : [];
     }
@@ -148,6 +146,7 @@ class RepositorioVisitaPDO extends JoinableDataLayer implements RepositorioVisit
         $visitanteId = $vs->getId();
         $entidadeVisita = $this->getEntity();
         $entidadeVisitante = $repVisitante->getEntity();
+        $colunas = "$entidadeVisita.*, $entidadeVisitante.nome, $entidadeVisitante.cpf";
 
         $where = "$entidadeVisita.visitante_id = :visitante_id";
         $param = "visitante_id=$visitanteId";
@@ -160,19 +159,16 @@ class RepositorioVisitaPDO extends JoinableDataLayer implements RepositorioVisit
             }
         }
 
-        if ($parametros?->ordenarPor && in_array($parametros->ordenarPor, self::BUSCAR_POR_JOIN)) {
-            $this->order(Utils::arrayParaString($parametros->ordenarPor));
-        }
+        [$where, $params] = $this->definirDetalhesBusca($parametros, $where, $param);
 
-        if ($parametros?->limite > 0) {
-            $this->limit($parametros->limite);
-        }
-
-        if ($parametros?->offset > 0) {
-            $this->offset($parametros->offset);
-        }
-
-        $this->findWithJoin($entidadeVisitante, "id", "visitante_id", $where, $param);
+        $this->findWithJoin(
+            $entidadeVisitante,
+            "id",
+            "visitante_id",
+            $where,
+            $params,
+            $colunas
+        );
         $resultado = $this->fetch(true);
         return $this->count() ? array_map(fn($rs) => $rs->data(), $resultado) : [];
     }
@@ -245,5 +241,33 @@ class RepositorioVisitaPDO extends JoinableDataLayer implements RepositorioVisit
         foreach ($propriedades as $propriedade => $valor) {
             $this->$propriedade = $valor;
         }
+    }
+
+    private function definirDetalhesBusca(?ParametroBusca $parametros = null, $where = "", $params = ""): array
+    {
+        if ($parametros?->ordenarPor) {
+            $this->order(Utils::arrayParaString($parametros->ordenarPor));
+        }
+        if ($parametros?->limite) {
+            $this->limit($parametros->limite);
+        }
+        if ($parametros?->limite && $parametros?->offset) {
+            $this->offset($parametros->offset);
+        }
+        if ($parametros?->dataInicio) {
+            $where .= "data_visita >= :dataInicio";
+            $params .=  strlen($params) > 0 ? "&" : "";
+            $params .= "dataInicio={$parametros->dataInicio->format(Utils::FORMATOS_DATA['date'])}";
+        }
+        if ($parametros?->dataFim) {
+            if (strlen($where > 0)) {
+                $where .= " AND ";
+            }
+            $where .= "data_visita <= :dataFim";
+            $params .=  strlen($params) > 0 ? "&" : "";
+            $params .= "dataFim={$parametros->dataFim->format(Utils::FORMATOS_DATA['date'])}";
+        }
+
+        return [$where, $params];
     }
 }

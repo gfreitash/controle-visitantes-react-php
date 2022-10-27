@@ -27,6 +27,11 @@ class DadosVisitante extends Entidade
         $this->formatoData = Utils::FORMATOS_DATA['date'];
     }
 
+    public static function mascaraCpf(string $cpf): string
+    {
+        return preg_replace('/(\d{3})(\d{3})(\d{3})(\d{2})/', '$1.$2.$3-$4', $cpf);
+    }
+
     public static function validarCPF(string $cpf, bool $strict = false): bool|string
     {
         $cpf = str_replace(array('.', '-'), '', $cpf);

@@ -165,13 +165,13 @@ class Visitante extends Entidade
     /**
      * @param string $formatoData
      */
-    public function setFormatoData(string $formatoData): bool
+    public function setFormatoData(string $formatoData): Visitante|null
     {
         if (in_array($formatoData, Utils::FORMATOS_DATA, true)) {
             $this->formatoData = $formatoData;
-            return true;
+            return $this;
         }
-        return false;
+        return null;
     }
 
 }

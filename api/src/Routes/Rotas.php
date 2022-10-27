@@ -5,6 +5,7 @@ namespace App\Visitantes\Routes;
 use App\Visitantes\Controllers\ControladorLogin;
 use App\Visitantes\Controllers\ControladorLogout;
 use App\Visitantes\Controllers\ControladorRefresh;
+use App\Visitantes\Controllers\ControladorRelatorio;
 use App\Visitantes\Controllers\ControladorUsuario;
 use App\Visitantes\Controllers\ControladorVisita;
 use App\Visitantes\Controllers\ControladorVisitante;
@@ -35,6 +36,10 @@ class Rotas
         ],
         "/visita" => [
             "classe" => ControladorVisita::class,
+            "autorizacao" => self::AUTORIZACAO[1],
+        ],
+        "/relatorio" => [
+            "classe" => ControladorRelatorio::class,
             "autorizacao" => self::AUTORIZACAO[1],
         ],
     ];

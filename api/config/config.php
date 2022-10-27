@@ -35,8 +35,13 @@ const DATA_LAYER_CONFIG = [
     ]
 ];
 
-/** diretório onde as fotos de visitantes são salvas */
+/** Diretório onde as fotos de visitantes são salvas */
 const DIR_FOTOS = '/assets/imgs/fotos/';
 
 //Definindo o timezone padrão
 date_default_timezone_set('America/Sao_Paulo');
+
+//Definindo o locale padrão para pt_BR
+$locale = 'pt_BR';
+setlocale(LC_ALL, $locale, 'pt_BR.utf-8', 'pt_BR.utf-8', 'portuguese');
+\PhpOffice\PhpSpreadsheet\Settings::setLocale($locale);

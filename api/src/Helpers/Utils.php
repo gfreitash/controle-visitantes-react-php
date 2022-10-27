@@ -9,6 +9,7 @@ class Utils
     public const FORMATOS_DATA =
         ['datetime' => "Y-m-d H:i:s",
             'date' => "Y-m-d", 'web' => 'Y-m-d\TH:i:s',
+            'datetime_local' => 'd/m/Y H:i:s',
             'datetime_local_curto' => 'd/m/Y H:i',
             'date_local' => 'd/m/Y'];
 
@@ -39,6 +40,27 @@ class Utils
         }
 
         return "";
+    }
+
+    public static function tentarCriarDateTime(?string $data): ?DateTime
+    {
+        if (!$data) {return null;}
+
+        foreach (self::FORMATOS_DATA as $formato) {
+            $retorno = DateTime::createFromFormat($formato, $data);
+            if ($retorno) {
+                return $retorno;
+            }
+        }
+        return null;
+    }
+
+    public static function seNuloRetornarVazio($var): string
+    {
+        if (empty($var)) {
+            return "";
+        }
+        return $var;
     }
 
     public static function converterBinarioParaBase64($uploadBinario, $mime): string

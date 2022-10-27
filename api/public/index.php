@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpStatementHasEmptyBodyInspection */
 
 use App\Visitantes\Factories\FabricaRequest;
 use App\Visitantes\Helpers\Utils;
@@ -18,6 +18,7 @@ if (!empty($_SERVER['HTTP_ORIGIN'])) {
     http_response_code(200);
     header("Access-Control-Allow-Origin: $origem"); //Origem permitida
     header("Access-Control-Allow-Headers: Authorization, Content-Type"); //Cabeçalhos permitidos
+    header("Access-Control-Expose-Headers: Content-Disposition"); //Cabeçalhos expostos
     header("Access-Control-Allow-Credentials: true"); //Credenciais são permitidas
     header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS"); //Métodos permitidos
     header("Access-Control-Max-Age: $maxAge"); //Tempo de cache
@@ -55,5 +56,7 @@ foreach ($resposta->getHeaders() as $name => $values) {
     }
 }
 http_response_code($resposta->getStatusCode());
-
+while (@ob_end_flush()) {
+    //Envia o conteúdo de todos os buffers de saída e limpa-os
+}
 echo $resposta->getBody();

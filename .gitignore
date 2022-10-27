@@ -1,6 +1,6 @@
 api/vendor/
 composer.lock
-composer.phar
+api/composer.phar
 package-lock.json
 
 old-files/
