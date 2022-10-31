@@ -3,6 +3,7 @@ import {Link, useNavigate} from "react-router-dom";
 
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import useQuery from "../hooks/useQuery";
+import useInvalidSessionHandler from "../hooks/useInvalidSessionHandler";
 
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faSort, faSortDown, faSortUp} from "@fortawesome/free-solid-svg-icons";
@@ -17,6 +18,8 @@ export default function ListaItens(props) {
     const axios = useAxiosPrivate();
     const query = useQuery();
     const navigate = useNavigate();
+    const handleInvalidSession = useInvalidSessionHandler();
+
     const {pagina, setPagina, ordenar, setOrdenar, ordem, setOrdem, urls, setUrls, pesquisa, setPesquisa} = useContext(ListaContext);
     const permitirDisplayPesquisa = props.permitirPesquisa ? {display: "block"} : {display: "none"};
 
@@ -75,10 +78,13 @@ export default function ListaItens(props) {
                 const resposta = await axios.get(url, {signal: controlador.signal});
                 isMounted && setResultado(resposta.data);
             } catch (e) {
-                if (e.code === "ERR_CANCELED") {
-                    return;
+                if (e.response?.status === 401) {
+                    handleInvalidSession();
+                } else {
+                    if (e.code !== "ERR_CANCELED") {
+                        console.log(e);
+                    }
                 }
-                console.log(e);
             }
         }
 

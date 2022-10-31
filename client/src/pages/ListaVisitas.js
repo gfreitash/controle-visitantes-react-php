@@ -15,7 +15,7 @@ import {
     faPersonWalkingDashedLineArrowRight
 } from "@fortawesome/free-solid-svg-icons";
 
-import {mascaraCPF} from "../assets/js/modules/dados-visitante";
+import {mascaraCPF} from "../assets/js/dados-visitante";
 import Titulo from "../components/Titulo";
 import Alerta from "../components/Alerta";
 import ListaItens, {TableData, TableHeader} from "../components/ListaItens";

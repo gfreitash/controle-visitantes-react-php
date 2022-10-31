@@ -2,7 +2,7 @@ import React, {useEffect, useRef, useState} from "react";
 import {Form} from "react-bootstrap";
 
 import "../assets/css/dados-registro.css"
-import * as Funcoes from "../assets/js/modules/dados-visitante"
+import * as Funcoes from "../assets/js/dados-visitante"
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import useInvalidSessionHandler from "../hooks/useInvalidSessionHandler";
 

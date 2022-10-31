@@ -2,7 +2,7 @@ import React, {useState} from "react";
 import {Form, Modal} from "react-bootstrap";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import fileDownload from "js-file-download";
-import * as Funcoes from "../assets/js/modules/dados-visitante";
+import * as Funcoes from "../assets/js/dados-visitante";
 import useInvalidSessionHandler from "../hooks/useInvalidSessionHandler";
 
 export async function emitirRelatorioVisita({axios, dataInicio, dataFim, cpf, apenasAbertas}) {

@@ -5,7 +5,7 @@ import useAuth from "../hooks/useAuth";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 
 import "../assets/css/form-cadastro.css"
-import {validaCPF} from "../assets/js/modules/dados-visitante";
+import {validaCPF} from "../assets/js/dados-visitante";
 
 import DadosVisitante from "../components/DadosVisitante";
 import FotoVisitante from "../components/FotoVisitante";

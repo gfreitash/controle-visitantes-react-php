@@ -5,7 +5,7 @@ import {Link} from "react-router-dom";
 import {faBuilding, faCirclePlus, faPenToSquare, faUser} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
-import {mascaraCPF} from "../assets/js/modules/dados-visitante";
+import {mascaraCPF} from "../assets/js/dados-visitante";
 
 import Titulo from "../components/Titulo";
 import ListaItens, {TableData, TableHeader} from "../components/ListaItens";

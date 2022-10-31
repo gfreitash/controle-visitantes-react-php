@@ -135,7 +135,7 @@ export default function ModalRelatorioVisitante({exibir, onFechar}) {
             handleFechar();
         } catch (error) {
             if (error.response.status === 401) {
-                handleInvalidSession(error);
+                handleInvalidSession();
             }
         }
     }

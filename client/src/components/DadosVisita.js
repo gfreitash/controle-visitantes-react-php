@@ -9,7 +9,7 @@ export default function DadosVisita(props) {
         id: props.id ?? "",
         salaVisita: "",
         motivoVisita: "",
-        foiLiberado: -1
+        foiLiberado: 1
     });
 
     const foi_liberado = {

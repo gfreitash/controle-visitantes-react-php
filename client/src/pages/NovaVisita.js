@@ -6,7 +6,7 @@ import useQuery from "../hooks/useQuery";
 import useAuth from "../hooks/useAuth";
 import useInvalidSessionHandler from "../hooks/useInvalidSessionHandler";
 
-import {validaCPF} from "../assets/js/modules/dados-visitante";
+import {validaCPF} from "../assets/js/dados-visitante";
 
 import Titulo from "../components/Titulo";
 import FotoVisitante from "../components/FotoVisitante";
@@ -99,7 +99,7 @@ export default function NovaVisita() {
                     </div>
                 </section>
 
-                <div className="acao" id="acao">
+                <div className="acao mt-3" id="acao">
                     <Link to="/inicio">
                         <button type="button" className="btn btn-secondary btn-acao">Cancelar</button>
                     </Link>

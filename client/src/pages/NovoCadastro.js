@@ -6,7 +6,7 @@ import useInvalidSessionHandler from "../hooks/useInvalidSessionHandler";
 import useAuth from "../hooks/useAuth";
 
 import "../assets/css/form-cadastro.css"
-import {validaCPF} from "../assets/js/modules/dados-visitante";
+import {validaCPF} from "../assets/js/dados-visitante";
 
 import Titulo from "../components/Titulo";
 import FotoVisitante from "../components/FotoVisitante";
@@ -104,7 +104,7 @@ export default function NovoCadastro() {
                         </button>
                     </Link>
                     {
-                        visitanteEncontrado.cpf
+                        visitanteEncontrado?.cpf
                             ? (
                                 <Link to={`/nova-visita?cpf=${visitanteEncontrado?.cpf}`}>
                                     <button type="button" className="btn btn-dark btn-acao">
