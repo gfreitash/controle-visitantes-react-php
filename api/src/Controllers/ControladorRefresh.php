@@ -12,7 +12,9 @@ use Psr\Http\Message\ServerRequestInterface;
 class ControladorRefresh extends ControladorRest
 {
     public function __construct(private readonly RepositorioUsuarioPDO $repositorioUsuario)
-    {}
+    {
+        parent::__construct();
+    }
 
     public function get(ServerRequestInterface $request): ResponseInterface
     {
@@ -24,7 +26,7 @@ class ControladorRefresh extends ControladorRest
         $usuario = $this->repositorioUsuario->buscarPor("email", $decoded->email);
 
         if (!$usuario) {
-            return new Response(403);
+            return new Response(400);
         }
         if ($usuario->getRefreshToken() !== $refreshToken) {
             $usuario->setRefreshToken(null);

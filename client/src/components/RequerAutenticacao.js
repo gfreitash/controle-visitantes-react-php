@@ -1,41 +1,34 @@
 import {Outlet} from "react-router-dom";
 import useAuth from "../hooks/useAuth";
-import {useEffect} from "react";
 import useInvalidSessionHandler from "../hooks/useInvalidSessionHandler";
-import axios from "../api/axios";
+import {useState} from "react";
+import useRefreshToken from "../hooks/useRefreshToken";
+import useEffectOnce from "../hooks/useEffectOnce";
 
 
 export default function RequerAutenticacao() {
-    const {auth, setAuth} = useAuth();
+    const {auth} = useAuth();
+    const refresh = useRefreshToken();
     const handleInvalidSession = useInvalidSessionHandler();
-    let recarregado = false;
 
-    useEffect(() => {
+    const [carregando, setCarregando] = useState(true);
 
-        if(!auth?.accessToken && !recarregado) {
-            const getAuth = async () => {
-                try {
-                    const response = await axios.get("/refresh", {
-                        withCredentials: true
-                    });
+    useEffectOnce(() => {
 
-                    const accessToken = response?.data?.accessToken ? "Bearer " + response?.data?.accessToken : null;
-                    const nome = response?.data?.nome;
-                    const id = response?.data?.id;
-                    const email = response?.data?.email;
-                    const refreshed = true;
-
-                    setAuth({nome, id, email, accessToken, refreshed});
-                } catch (e) {
+        const verificarLogin = async () => {
+            try {
+                await refresh();
+            } catch (error) {
+                if (error.response?.status === 403) {
                     handleInvalidSession();
                 }
+            } finally {
+                setCarregando(false);
             }
-            getAuth();
         }
-        return () => {
-            recarregado = true;
-        }
-    }, []);
 
-    return (<Outlet/>);
+        !auth?.accessToken ? verificarLogin(): setCarregando(false);
+    },[]);
+
+    return carregando ? (<div>Carregando...</div>) : <Outlet/>;
 }
