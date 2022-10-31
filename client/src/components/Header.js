@@ -34,13 +34,12 @@ export default function Header(props) {
         const args = {
             axios: axiosPrivate,
             dataInicio: data,
-            dataFim: data
         }
         try {
             await funcaoEmissao(args);
         } catch (error) {
             if (error.response.status === 401) {
-                handleInvalidSession(error);
+                handleInvalidSession();
             }
         }
     }
