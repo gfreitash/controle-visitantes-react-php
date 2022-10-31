@@ -17,6 +17,7 @@ import NovaVisita from "./pages/NovaVisita";
 import Visita from "./pages/Visita";
 import ListaVisitas from "./pages/ListaVisitas";
 import ModalRelatorioVisitas from "./components/ModalRelatorioVisitas";
+import Inicio from "./pages/Inicio";
 
 export default function App() {
     const {auth} = useAuth();
@@ -26,6 +27,8 @@ export default function App() {
             <Header usuario={auth.nome}/>
             <Main>
                 <Routes>
+                    <Route path="/" element={<Inicio/>}/>
+                    <Route path="/inicio" element={<Inicio/>}/>
                     <Route path="/novo-cadastro" element={<NovoCadastro/>}/>
                     <Route path="/lista-visitantes" element={<ListaVisitantes/>}/>
                     <Route path="/visitante" element={<Visitante/>}/>

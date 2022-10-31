@@ -1,0 +1,22 @@
+a {
+    color: white;
+}
+
+a:hover {
+    color: #dfdfdf;
+}
+
+.inicio__display {
+    display: flex;
+    margin-bottom: 1rem;
+    padding: .35rem;
+}
+
+.inicio__display .nav {
+    --bs-nav-link-color: var(--bs-gray-900);
+    --bs-nav-link-hover-color: var(--bs-black);
+}
+
+.inicio__icone svg {
+    color: var(--bs-gray-900);
+}

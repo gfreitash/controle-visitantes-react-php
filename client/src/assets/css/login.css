@@ -1,4 +1,4 @@
-.pagina {
+.login__pagina {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -7,7 +7,7 @@
     height: 100vh;
 }
 
-.card {
+.login__card {
     background-color: #fff;
     display: flex;
     flex-direction: column;
@@ -17,7 +17,7 @@
     border-radius: .5rem;
 }
 
-.login-form {
+.login__form {
     display: flex;
     flex-direction: column;
     justify-content: center;

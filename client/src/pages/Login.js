@@ -16,8 +16,7 @@ export default function Login() {
 
     const navigate = useNavigate();
     const location = useLocation();
-    const from = location.state?.from?.pathname + location.state?.from?.search  || "/";
-
+    const from = location.state?.from?.pathname + location.state?.from?.search || "/inicio";
     const emailRef = useRef();
     const alertaRef = useRef();
 
@@ -77,15 +76,15 @@ export default function Login() {
         }
     }
     return (
-        <div className="pagina">
-            <div className="card">
+        <div className="login__pagina">
+            <div className="login__card">
                 <img src={logo} alt="logo" width="150px" height="115px"/>
                 <br/>
                 <b>Controle de Visitantes</b>
                 <br/>
                 <div id="alerta" ref={alertaRef} className={alerta.mensagem ? `alert alert-${alerta.tipo}` : ""}>{alerta.mensagem}</div>
                 <p className="text-muted">Faça login para acessar o sistema</p>
-                <form onSubmit={handleSubmit} className="login-form" id="login-form">
+                <form onSubmit={handleSubmit} className="login__form" id="login-form">
                     <InputGroup className="mb-3">
                         <InputGroup.Text>
                             <FontAwesomeIcon icon={faUser}/>
