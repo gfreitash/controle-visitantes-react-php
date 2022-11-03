@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 
 export default function Titulo(props) {
     const titulo = {
@@ -6,6 +6,11 @@ export default function Titulo(props) {
         justifyContent: "space-between",
         alignItems: "center"
     }
+
+    useEffect(() => {
+        let titulo = props.titulo ? props.titulo : props.children;
+        document.title = `Controle de Visitantes - ${titulo}`;
+    },[props.children]);
 
     return (
         <>

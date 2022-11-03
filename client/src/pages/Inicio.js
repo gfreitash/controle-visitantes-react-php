@@ -54,7 +54,7 @@ export default function Inicio() {
 
     return (
         <>
-            <Titulo>Boas vindas, {usuario}!</Titulo>
+            <Titulo titulo="Início">Boas vindas, {usuario}!</Titulo>
             <hr/>
 
             <section className="inicio__display width--100">
