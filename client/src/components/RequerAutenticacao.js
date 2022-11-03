@@ -14,12 +14,12 @@ export default function RequerAutenticacao() {
     const [carregando, setCarregando] = useState(true);
 
     useEffectOnce(() => {
-
+        console.log("RequerAutenticacao: useEffectOnce");
         const verificarLogin = async () => {
             try {
                 await refresh();
             } catch (error) {
-                if (error.response?.status === 403) {
+                if (error.response?.status === 401) {
                     handleInvalidSession();
                 }
             } finally {
