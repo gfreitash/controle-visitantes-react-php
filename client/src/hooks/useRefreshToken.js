@@ -1,14 +1,13 @@
-import {axiosPrivate} from "../api/axios";
-import useAuth from "./useAuth";
-
 import React from "react";
+
+import useAuth from "./useAuth";
+import axios from "../api/axios";
 
 export default function useRefreshToken() {
     const {setAuth} = useAuth();
-    const axios = axiosPrivate;
 
     return async () => {
-        const response = await axios.get("/refresh");
+        const response = await axios.get("/refresh", {withCredentials: true});
 
         setAuth({
             nome: response.data.nome,

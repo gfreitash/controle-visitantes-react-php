@@ -1,6 +1,7 @@
 import React, {useRef, useState, useEffect} from "react";
 import {useNavigate, useLocation} from "react-router-dom";
 import useAuth from "../hooks/useAuth";
+import useRefreshToken from "../hooks/useRefreshToken";
 
 import {InputGroup, Form} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -12,6 +13,7 @@ import axios from "../api/axios";
 
 export default function Login() {
     const LOGIN_URL = "/login";
+    const refresh = useRefreshToken();
     const {auth, setAuth} = useAuth();
 
     const navigate = useNavigate();
@@ -25,18 +27,34 @@ export default function Login() {
     const [alerta, setAlerta] = useState({});
 
     useEffect(() => {
+        const autenticar = async () => {
+            try {
+                await refresh();
+            } catch (e) {
+                console.log(e);
+            }
+        }
+
+        !auth.accessToken && autenticar();
+    },[]);
+
+    useEffect(() => {
         if (auth?.accessToken) {
-            navigate(from);
+            if (from === "/login") {
+                navigate("/inicio");
+            } else {
+                navigate(from);
+            }
             return;
         }
 
-        if (auth?.alerta) {
+        if (auth?.alerta && from !== "/") {
             alertaRef.current.className = `alert alert-${auth.alerta.tipo}`;
             alertaRef.current.innerText = auth.alerta.mensagem;
         }
 
         emailRef.current.focus();
-    }, []);
+    }, [auth]);
 
     useEffect(() => {
         setAlerta({});

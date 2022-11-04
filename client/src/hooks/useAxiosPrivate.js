@@ -24,14 +24,18 @@ export default function useAxiosPrivate() {
         const interceptadorResposta = axiosPrivate.interceptors.response.use(
             response => response,
             async error => {
-                const prevRequest = error?.config;
+                const prevRequest = error.config;
                 if (error.code !== "ERR_CANCELED" && error.response?.status === 401 && !prevRequest?.sent) {
-                    prevRequest.sent = true;
-                    const accessToken = await refresh();
-                    prevRequest.headers.Authorization = `Bearer ${accessToken}`;
-                    return axiosPrivate(prevRequest);
-                } else if (error.response?.status === 401 && prevRequest?.sent) {
-                    handleInvalidSession();
+                    try {
+                        prevRequest.sent = true;
+                        const accessToken = await refresh();
+                        prevRequest.headers.Authorization = `Bearer ${accessToken}`;
+                        return axiosPrivate(prevRequest);
+                    } catch (error) {
+                        if (error.response?.status === 401) {
+                            handleInvalidSession();
+                        }
+                    }
                 }
 
                 return Promise.reject(error);
@@ -42,7 +46,7 @@ export default function useAxiosPrivate() {
             axiosPrivate.interceptors.request.eject(interceptadorRequisicao);
             axiosPrivate.interceptors.response.eject(interceptadorResposta);
         }
-    }, [auth, refresh]);
+    }, [auth]);
 
     return axiosPrivate;
 }
