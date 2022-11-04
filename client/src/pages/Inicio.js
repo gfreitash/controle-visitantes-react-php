@@ -10,11 +10,13 @@ import {Card, Nav} from "react-bootstrap";
 import {Link} from "react-router-dom";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faSquarePlus} from "@fortawesome/free-solid-svg-icons";
+import Alerta from "../components/Alerta";
 
 export default function Inicio() {
     const {auth} = useAuth();
     const axios = useAxiosPrivate();
 
+    const [alerta, setAlerta] = useState({tipo: "", mensagem: ""});
     const [abaVisitanteAtiva, setAbaVisitanteAtiva] = useState("ativos");
     const [dados, setDados] = useState(null);
 
@@ -29,6 +31,10 @@ export default function Inicio() {
     useEffect(() => {
         const controlador = new AbortController();
         let isMounted = true;
+
+        if (auth?.alerta) {
+            setAlerta(auth.alerta);
+        }
 
         const obterDados = async () => {
             try {
@@ -56,7 +62,7 @@ export default function Inicio() {
         <>
             <Titulo titulo="Início">Boas vindas, {usuario}!</Titulo>
             <hr/>
-
+            <Alerta alerta={alerta} setAlerta={setAlerta}/>
             <section className="inicio__display width--100">
                 <div className="flex-grow-1">
                     <Card>

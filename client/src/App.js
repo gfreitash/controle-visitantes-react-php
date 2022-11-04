@@ -18,6 +18,7 @@ import Visita from "./pages/Visita";
 import ListaVisitas from "./pages/ListaVisitas";
 import ModalRelatorioVisitas from "./components/ModalRelatorioVisitas";
 import Inicio from "./pages/Inicio";
+import AlterarSenha from "./pages/AlterarSenha";
 
 export default function App() {
     const {auth} = useAuth();
@@ -36,6 +37,7 @@ export default function App() {
                     <Route path="/lista-visitas/:id" element={<ListaVisitas/>}/>
                     <Route path="/visita" element={<Visita/>}/>
                     <Route path="/relatorio-visitas" element={<ModalRelatorioVisitas/>}/>
+                    <Route path="/alterar-senha" element={<AlterarSenha/>}/>
                     <Route path="*" element={<h1>404 - Página não encontrada</h1>}/>
                 </Routes>
             </Main>

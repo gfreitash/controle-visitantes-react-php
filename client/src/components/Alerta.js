@@ -2,8 +2,7 @@ import React, {useRef} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCheckCircle, faExclamationTriangle, faTimes} from "@fortawesome/free-solid-svg-icons";
 
-export default function Alerta(props) {
-    const {alerta, setAlerta, alertaRef} = props;
+export default function Alerta({alerta, setAlerta, alertaRef}) {
     const ref = useRef();
 
     const alertaIcone = () => {
