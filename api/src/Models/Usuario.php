@@ -13,6 +13,7 @@ class Usuario extends Entidade
     private string $senha;
     private ?string $refreshToken;
     private ?DateTime $dataUltimaMod;
+    private ?bool $modificouSenha;
 
     /**
      * @param int $id
@@ -26,6 +27,7 @@ class Usuario extends Entidade
         $this->nome = $nome;
         $this->email = $email;
         $this->senha = $senha;
+        $this->modificouSenha = null;
     }
 
 
@@ -35,10 +37,11 @@ class Usuario extends Entidade
         $arr['id'] = $this->id;
         $arr['nome'] = strtoupper($this->nome);
         $arr['email'] = strtolower($this->email);
+        $arr['modificou_senha'] = $this->modificouSenha;
 
         !empty($this->dataUltimaMod) ?
-            $arr['dataUltimaMod'] = $this->dataUltimaMod->format("d/m/Y"):
-            $arr['dataUltimaMod'] = null;
+            $arr['data_ultima_mod'] = $this->dataUltimaMod->format("d/m/Y"):
+            $arr['data_ultima_mod'] = null;
 
         return $arr;
     }
@@ -144,5 +147,19 @@ class Usuario extends Entidade
         $this->refreshToken = $refreshToken;
     }
 
+    /**
+     * @return bool
+     */
+    public function isModificouSenha(): bool
+    {
+        return $this->modificouSenha;
+    }
 
+    /**
+     * @param bool $modificouSenha
+     */
+    public function setModificouSenha(bool $modificouSenha): void
+    {
+        $this->modificouSenha = $modificouSenha;
+    }
 }

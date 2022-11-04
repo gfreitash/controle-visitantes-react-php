@@ -34,3 +34,4 @@ yarn-error.log*
 /client/src/assets/imgs/logo.png
 /client/src/assets/imgs/logo-light.png
 /client/node_modules/
+/api/.tool-versions

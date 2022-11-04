@@ -35,7 +35,7 @@ class ControladorLogin extends ControladorRest
             return new Response(401);
         }
 
-        $senhaEstaCorreta = md5($senha) === $usuario->getSenha();
+        $senhaEstaCorreta = password_verify($senha, $usuario->getSenha());
         if (!$senhaEstaCorreta) {
             return new Response(401);
         }
