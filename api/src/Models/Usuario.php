@@ -2,28 +2,28 @@
 
 namespace App\Visitantes\Models;
 
-use DateTime;
 use App\Visitantes\Interfaces\Entidade;
 
 class Usuario extends Entidade
 {
-    private int $id;
+    private ?int $id;
+    private int $funcao;
     private string $nome;
     private string $email;
     private string $senha;
     private ?string $refreshToken;
-    private ?DateTime $dataUltimaMod;
     private ?bool $modificouSenha;
 
     /**
-     * @param int $id
+     * @param ?int $id
      * @param string $nome
      * @param string $email
      * @param string $senha
      */
-    public function __construct(int $id, string $nome, string $email, string $senha = "")
+    public function __construct(?int $id, int $funcao, string $nome, string $email, string $senha = "")
     {
         $this->id = $id;
+        $this->funcao = $funcao;
         $this->nome = $nome;
         $this->email = $email;
         $this->senha = $senha;
@@ -35,31 +35,44 @@ class Usuario extends Entidade
     {
         $arr = array();
         $arr['id'] = $this->id;
+        $arr['funcao'] = $this->funcao;
         $arr['nome'] = strtoupper($this->nome);
         $arr['email'] = strtolower($this->email);
         $arr['modificou_senha'] = $this->modificouSenha;
-
-        !empty($this->dataUltimaMod) ?
-            $arr['data_ultima_mod'] = $this->dataUltimaMod->format("d/m/Y"):
-            $arr['data_ultima_mod'] = null;
 
         return $arr;
     }
 
     /**
-     * @return int
+     * @return ?int
      */
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
 
     /**
-     * @param int $id
+     * @param ?int $id
      */
-    public function setId(int $id): void
+    public function setId(?int $id): void
     {
         $this->id = $id;
+    }
+
+    /**
+     * @return int
+     */
+    public function getFuncao(): int
+    {
+        return $this->funcao;
+    }
+
+    /**
+     * @param int $funcao
+     */
+    public function setFuncao(int $funcao): void
+    {
+        $this->funcao = $funcao;
     }
 
     /**
@@ -95,27 +108,6 @@ class Usuario extends Entidade
     }
 
     /**
-     * @return string|null
-     */
-    public function getDataUltimaMod(): ?DateTime
-    {
-        return $this->dataUltimaMod;
-    }
-
-    /**
-     * Espera um DateTime, qualquer outro valor fará a variável ser definida para nulo
-     * @param $dataUltimaMod
-     */
-    public function setDataUltimaMod($dataUltimaMod): void
-    {
-        if ($dataUltimaMod instanceof DateTime) {
-            $this->dataUltimaMod = $dataUltimaMod;
-        } else {
-            $this->dataUltimaMod = null;
-        }
-    }
-
-    /**
      * @return string
      */
     public function getSenha(): string
@@ -148,17 +140,17 @@ class Usuario extends Entidade
     }
 
     /**
-     * @return bool
+     * @return ?bool
      */
-    public function isModificouSenha(): bool
+    public function getModificouSenha(): ?bool
     {
         return $this->modificouSenha;
     }
 
     /**
-     * @param bool $modificouSenha
+     * @param ?bool $modificouSenha
      */
-    public function setModificouSenha(bool $modificouSenha): void
+    public function setModificouSenha(?bool $modificouSenha): void
     {
         $this->modificouSenha = $modificouSenha;
     }

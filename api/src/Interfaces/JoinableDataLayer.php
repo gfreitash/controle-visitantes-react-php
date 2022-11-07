@@ -46,4 +46,11 @@ abstract class JoinableDataLayer extends DataLayer
 
         return $this;
     }
+
+     protected function atribuirPropriedades(array $propriedades): void
+     {
+         foreach ($propriedades as $propriedade => $valor) {
+             $this->$propriedade = $valor;
+         }
+     }
 }

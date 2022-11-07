@@ -43,6 +43,7 @@ class ControladorLogin extends ControladorRest
         $conteudo = [
             "nome" => $usuario->getNome(),
             "email" => $usuario->getEmail(),
+            "funcao" => $usuario->getFuncao(),
             "id" => $usuario->getId()
         ];
 

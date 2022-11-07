@@ -258,13 +258,6 @@ class RepositorioVisitaPDO extends JoinableDataLayer implements RepositorioVisit
         return $visita;
     }
 
-    private function atribuirPropriedades(array $propriedades): void
-    {
-        foreach ($propriedades as $propriedade => $valor) {
-            $this->$propriedade = $valor;
-        }
-    }
-
     private function definirDetalhesBusca(?ParametroBusca $parametros = null, $where = "", $params = ""): array
     {
         if ($parametros?->ordenarPor) {

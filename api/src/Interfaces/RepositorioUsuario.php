@@ -11,6 +11,8 @@ interface RepositorioUsuario
 
     public function buscarPor(string $campo, string $valor) : bool|Usuario;
 
+    public function criarUsuario(Usuario $usuario) : bool|int;
+
     public function alterarUsuario(Usuario $usuario): bool;
 
     public static function obterRepositorioUsuario(): RepositorioUsuario;

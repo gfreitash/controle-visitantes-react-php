@@ -2,16 +2,29 @@
 
 namespace App\Visitantes\Repositories;
 
-use CoffeeCode\DataLayer\DataLayer;
+use App\Visitantes\Interfaces\JoinableDataLayer;
 use App\Visitantes\Interfaces\RepositorioUsuario;
 use App\Visitantes\Models\Usuario;
 
-class RepositorioUsuarioPDO extends DataLayer implements RepositorioUsuario
+class RepositorioUsuarioPDO extends JoinableDataLayer implements RepositorioUsuario
 {
 
     public function __construct()
     {
-        parent::__construct("tb_usuario", ["nome", "email", "senha"], "id", false);
+        parent::__construct("tb_usuario", ["funcao", "nome", "email", "senha"], "id", false);
+    }
+
+    public function criarUsuario(Usuario $usuario): bool|int
+    {
+        $arr = $usuario->paraArray();
+        $arr['senha'] = $usuario->getSenha();
+
+        $this->atribuirPropriedades($arr);
+        if ($this->save()) {
+            return $this->buscarPorId($this->id)?->getId() ?? false;
+        }
+
+        return false;
     }
 
 
@@ -20,9 +33,9 @@ class RepositorioUsuarioPDO extends DataLayer implements RepositorioUsuario
         $dados = $this->findById($id);
 
         if ($dados) {
-            $usuario = new Usuario($id, $dados->nome, $dados->email, $dados->senha);
-            $usuario->setDataUltimaMod($dados->data_ultima_mod);
+            $usuario = new Usuario($id, $dados->funcao, $dados->nome, $dados->email, $dados->senha);
             $usuario->setRefreshToken($dados->refresh_token);
+            $usuario->setModificouSenha($dados->modificou_senha);
             return $usuario;
         }
 
@@ -36,11 +49,14 @@ class RepositorioUsuarioPDO extends DataLayer implements RepositorioUsuario
             return false;
         }
         $this->id = $usuario->getId();
+        $this->funcao = $usuario->getFuncao();
         $this->nome = $usuario->getNome();
         $this->email = $usuario->getEmail();
-        $this->data_ultima_mod = $usuario->getDataUltimaMod();
         $this->senha = empty($usuario->getSenha()) ? $usr->senha : $usuario->getSenha();
         $this->refresh_token = $usuario->getRefreshToken();
+        $this->modificou_senha = empty($usuario->getModificouSenha())
+            ? $usr->modificou_senha
+            : $usuario->getModificouSenha();
 
         return $this->save();
     }
@@ -56,9 +72,10 @@ class RepositorioUsuarioPDO extends DataLayer implements RepositorioUsuario
         if (!$dados) {
             return false;
         }
-        $usuario = new Usuario($dados->id, $dados->nome, $dados->email, $dados->senha);
-        $usuario->setDataUltimaMod($dados->data_ultima_mod);
+        $usuario = new Usuario($dados->id, $dados->funcao, $dados->nome, $dados->email, $dados->senha);
         $usuario->setRefreshToken($dados->refresh_token);
+        $usuario->setModificouSenha($dados->modificou_senha);
+
         return $usuario;
 
     }

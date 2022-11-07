@@ -38,6 +38,7 @@ class ControladorRefresh extends ControladorRest
         $conteudoToken = [
             "nome" => $usuario->getNome(),
             "email" => $usuario->getEmail(),
+            "funcao" => $usuario->getFuncao(),
             "id" => $usuario->getId()
         ];
 
