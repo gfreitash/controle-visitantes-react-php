@@ -68,3 +68,6 @@ CREATE TABLE `tb_visita`
 
 INSERT INTO tb_funcao (funcao) VALUES ('ADMINISTRADOR');
 INSERT INTO tb_funcao (funcao) VALUES ('USUARIO');
+
+/* Usuário administrador com senha padrão 123 */
+INSERT INTO tb_usuario (funcao, nome, email, senha) VALUES (1, 'ADMINISTRADOR', 'adm@adm.com', '$2y$13$oO4CWt40erbWk9xvqFACjO228OJ2gI4g1EIHDkizuRXQOPSvYZbGO');
