@@ -46,67 +46,67 @@ class ControladorDashboard extends ControladorRest
         }
 
         //obter visitas em aberto
-        $visitasAbertas = $this->repositorioVisita->obterTodasVisitas(Visita::STATUS[1]);
+        $visitasAbertas = $this->repositorioVisita->buscarTodas(Visita::STATUS[1]);
         $dados['visitas']['abertas'] = count($visitasAbertas);
 
         //obter visitas nesse dia
         $parametros = new ParametroBusca(dataInicio: $hoje);
-        $visitasHoje = $this->repositorioVisita->obterTodasVisitas(parametros: $parametros);
+        $visitasHoje = $this->repositorioVisita->buscarTodas(parametros: $parametros);
         $dados['visitas']['hoje'] = count($visitasHoje);
 
         //obter visitas nessa semana
         $parametros = new ParametroBusca(dataInicio: $semana);
-        $visitasSemana = $this->repositorioVisita->obterTodasVisitas(parametros: $parametros);
+        $visitasSemana = $this->repositorioVisita->buscarTodas(parametros: $parametros);
         $dados['visitas']['semana'] = count($visitasSemana);
 
         //obter visitas nesse mês
         $parametros = new ParametroBusca(dataInicio: $mes);
-        $visitasMes = $this->repositorioVisita->obterTodasVisitas(parametros: $parametros);
+        $visitasMes = $this->repositorioVisita->buscarTodas(parametros: $parametros);
         $dados['visitas']['mes'] = count($visitasMes);
 
         //obter visitas nesse ano
         $parametros = new ParametroBusca(dataInicio: $ano);
-        $visitasAno = $this->repositorioVisita->obterTodasVisitas(parametros: $parametros);
+        $visitasAno = $this->repositorioVisita->buscarTodas(parametros: $parametros);
         $dados['visitas']['ano'] = count($visitasAno);
 
         //obter visitantes ativos nesse dia
         $parametros = new ParametroBusca(dataInicio: $hoje);
-        $visitantesHoje = $this->repositorioVisita->obterVisitantesAtivos(parametros: $parametros);
+        $visitantesHoje = $this->repositorioVisita->buscarVisitantesAtivos(parametros: $parametros);
         $dados['visitantes']['ativos']['hoje'] = count($visitantesHoje);
 
         //obter visitantes ativos nessa semana
         $parametros = new ParametroBusca(dataInicio: $semana);
-        $visitantesSemana = $this->repositorioVisita->obterVisitantesAtivos(parametros: $parametros);
+        $visitantesSemana = $this->repositorioVisita->buscarVisitantesAtivos(parametros: $parametros);
         $dados['visitantes']['ativos']['semana'] = count($visitantesSemana);
 
         //obter visitantes ativos nesse mês
         $parametros = new ParametroBusca(dataInicio: $mes);
-        $visitantesMes = $this->repositorioVisita->obterVisitantesAtivos(parametros: $parametros);
+        $visitantesMes = $this->repositorioVisita->buscarVisitantesAtivos(parametros: $parametros);
         $dados['visitantes']['ativos']['mes'] = count($visitantesMes);
 
         //obter visitantes ativos nesse ano
         $parametros = new ParametroBusca(dataInicio: $ano);
-        $visitantesAno = $this->repositorioVisita->obterVisitantesAtivos(parametros: $parametros);
+        $visitantesAno = $this->repositorioVisita->buscarVisitantesAtivos(parametros: $parametros);
         $dados['visitantes']['ativos']['ano'] = count($visitantesAno);
 
         //obter visitantes cadastrados nesse dia
         $parametros = new ParametroBusca(dataInicio: $hoje);
-        $visitantesHoje = $this->repositorioVisitante->buscarTodosVisitantes(parametros: $parametros);
+        $visitantesHoje = $this->repositorioVisitante->buscarTodos(parametros: $parametros);
         $dados['visitantes']['cadastrados']['hoje'] = count($visitantesHoje);
 
         //obter visitantes cadastrados nessa semana
         $parametros = new ParametroBusca(dataInicio: $semana);
-        $visitantesSemana = $this->repositorioVisitante->buscarTodosVisitantes(parametros: $parametros);
+        $visitantesSemana = $this->repositorioVisitante->buscarTodos(parametros: $parametros);
         $dados['visitantes']['cadastrados']['semana'] = count($visitantesSemana);
 
         //obter visitantes cadastrados nesse mês
         $parametros = new ParametroBusca(dataInicio: $mes);
-        $visitantesMes = $this->repositorioVisitante->buscarTodosVisitantes(parametros: $parametros);
+        $visitantesMes = $this->repositorioVisitante->buscarTodos(parametros: $parametros);
         $dados['visitantes']['cadastrados']['mes'] = count($visitantesMes);
 
         //obter visitantes cadastrados nesse ano
         $parametros = new ParametroBusca(dataInicio: $ano);
-        $visitantesAno = $this->repositorioVisitante->buscarTodosVisitantes(parametros: $parametros);
+        $visitantesAno = $this->repositorioVisitante->buscarTodos(parametros: $parametros);
         $dados['visitantes']['cadastrados']['ano'] = count($visitantesAno);
 
         return new RespostaJson(200, json_encode($dados));

@@ -27,7 +27,7 @@ class RepositorioVisitantePDO extends JoinableDataLayer implements RepositorioVi
         parent::__construct("tb_visitante", ["cpf", "nome"], "id", false);
     }
 
-    public function adicionarVisitante($visitante): bool|int
+    public function criar($visitante): bool|int
     {
         $arr = $visitante->paraArray();
         unset($arr['modificado_em'], $arr['modificado_por']);
@@ -65,7 +65,7 @@ class RepositorioVisitantePDO extends JoinableDataLayer implements RepositorioVi
         return false;
     }
 
-    public function alterarVisitante($visitante): bool
+    public function atualizar($visitante): bool
     {
         $arr = $visitante->paraArray();
         $vs = $this->findById((int) $arr['id']);
@@ -80,13 +80,13 @@ class RepositorioVisitantePDO extends JoinableDataLayer implements RepositorioVi
         return $vs->save();
     }
 
-    public function removerVisitantePorCPF(string $cpf): bool
+    public function removerPorCpf(string $cpf): bool
     {
         $this->buscarPorCpf($cpf);
         return $this->destroy();
     }
 
-    public function buscarTodosVisitantes(ParametroBusca $parametros = null): array
+    public function buscarTodos(ParametroBusca $parametros = null): array
     {
         [$where, $params] = $this->definirDetalhesBusca($parametros);
         $this->find($where, $params);
@@ -95,7 +95,7 @@ class RepositorioVisitantePDO extends JoinableDataLayer implements RepositorioVi
         return $this->count() ? array_map(fn($rs) => $rs->data(), $resultado) : [];
     }
 
-    public function buscarVisitantesComo($termo, ParametroBusca $parametros = null): array
+    public function buscarComo($termo, ParametroBusca $parametros = null): array
     {
         if (DateTime::createFromFormat('d/m/Y', $termo)) {
             $termo = Utils::formatarData($termo, Utils::FORMATOS_DATA['date_local'], Utils::FORMATOS_DATA['date']);
@@ -184,7 +184,7 @@ class RepositorioVisitantePDO extends JoinableDataLayer implements RepositorioVi
         return new RepositorioVisitantePDO();
     }
 
-    public function obterTotalVisitantes(string $como = ""): int
+    public function obterTotal(string $como = ""): int
     {
         $conexao = Conexao::criarConexao();
         if ($como) {

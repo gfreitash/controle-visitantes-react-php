@@ -83,13 +83,13 @@ class ControladorRelatorio extends ControladorRest
             if (!$visitante) {
                 return new RespostaJson(404, json_encode(['error' => 'Visitante não encontrado']));
             }
-            $visitas = $this->repositorioVisita->obterTodasVisitasDeVisitante(
+            $visitas = $this->repositorioVisita->buscarTodasDeVisitante(
                 $visitante,
                 $status,
                 new ParametroBusca(RepositorioVisitaPDO::BUSCAR_POR_JOIN, dataInicio: $inicio, dataFim: $fim)
             );
         } else {
-            $visitas = $this->repositorioVisita->obterTodasVisitas(
+            $visitas = $this->repositorioVisita->buscarTodas(
                 $status,
                 new ParametroBusca(RepositorioVisitaPDO::BUSCAR_POR_JOIN, dataInicio: $inicio, dataFim: $fim)
             );
@@ -116,9 +116,9 @@ class ControladorRelatorio extends ControladorRest
         $parametros = new ParametroBusca(RepositorioVisitantePDO::BUSCAR_POR, dataInicio: $inicio, dataFim: $fim);
 
         if ($status === 'ativos') {
-            $visitantes = $this->repositorioVisita->obterVisitantesAtivos($parametros);
+            $visitantes = $this->repositorioVisita->buscarVisitantesAtivos($parametros);
         } else { //$status === 'cadastrados'
-            $visitantes = $this->repositorioVisitante->buscarTodosVisitantes($parametros);
+            $visitantes = $this->repositorioVisitante->buscarTodos($parametros);
         }
 
         return $this->emitirRelatorio(

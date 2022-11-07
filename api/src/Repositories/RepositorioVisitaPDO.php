@@ -56,7 +56,7 @@ class RepositorioVisitaPDO extends JoinableDataLayer implements RepositorioVisit
         return $this;
     }
 
-    public function adicionarVisita(Visita $visita): bool|Visita
+    public function criar(Visita $visita): bool|Visita
     {
         $arr = $visita->paraArray();
         unset($arr['modificada_em'], $arr['modificada_por'], $arr['cpf'], $arr['nome']);
@@ -78,7 +78,7 @@ class RepositorioVisitaPDO extends JoinableDataLayer implements RepositorioVisit
         return false;
     }
 
-    public function alterarVisita(Visita $visita): bool
+    public function atualizar(Visita $visita): bool
     {
         $arr = $visita->paraArray();
         unset($arr['cpf'], $arr['nome']);
@@ -93,13 +93,13 @@ class RepositorioVisitaPDO extends JoinableDataLayer implements RepositorioVisit
         return false;
     }
 
-    public function removerVisitaPorId($id): bool
+    public function removerPorId($id): bool
     {
         $this->findById($id);
         return $this->destroy();
     }
 
-    public function obterTodasVisitas(
+    public function buscarTodas(
         string $status = "",
         ParametroBusca $parametros = null
     ): array
@@ -132,7 +132,7 @@ class RepositorioVisitaPDO extends JoinableDataLayer implements RepositorioVisit
         return $this->count() ? array_map(fn($rs) => $rs->data(), $resultado) : [];
     }
 
-    public function obterTodasVisitasDeVisitante(
+    public function buscarTodasDeVisitante(
         Visitante $visitante,
         string $status = "",
         ParametroBusca $parametros = null
@@ -173,7 +173,7 @@ class RepositorioVisitaPDO extends JoinableDataLayer implements RepositorioVisit
         return $this->count() ? array_map(fn($rs) => $rs->data(), $resultado) : [];
     }
 
-    public function obterVisitantesAtivos(?ParametroBusca $parametros = null): array
+    public function buscarVisitantesAtivos(?ParametroBusca $parametros = null): array
     {
         $repVisitante = RepositorioVisitantePDO::obterRepositorioVisitante();
         $entidadeVisitante = $repVisitante->getEntity();
@@ -195,7 +195,7 @@ class RepositorioVisitaPDO extends JoinableDataLayer implements RepositorioVisit
     }
 
 
-    public function obterTotalVisitas(?string $status = ""): int
+    public function obterTotal(?string $status = ""): int
     {
         $conexao = Conexao::criarConexao();
         if ($status) {

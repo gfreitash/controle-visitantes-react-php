@@ -85,7 +85,7 @@ class ControladorVisita extends ControladorRest
             $visita->setFinalizadaPor($dados['idUsuario']);
         }
 
-        $resultado = $this->repositorioVisita->adicionarVisita($visita);
+        $resultado = $this->repositorioVisita->criar($visita);
         if (!$resultado) {
             return $this->_500;
         }
@@ -121,7 +121,7 @@ class ControladorVisita extends ControladorRest
             $visita->setFinalizadaPor($dados['idUsuario']);
         }
 
-        $resultado = $this->repositorioVisita->alterarVisita($visita);
+        $resultado = $this->repositorioVisita->atualizar($visita);
 
         if (!$resultado) {
             return $this->_500;
@@ -145,7 +145,7 @@ class ControladorVisita extends ControladorRest
         $visita->setFinalizadaPor((int) $params['idUsuario']);
         $visita->setFinalizadaEm(new \DateTime());
 
-        $resultado = $this->repositorioVisita->alterarVisita($visita);
+        $resultado = $this->repositorioVisita->atualizar($visita);
 
         if (!$resultado) {
             return new RespostaJson(500, json_encode(['error' => 'Erro interno']));
@@ -168,7 +168,7 @@ class ControladorVisita extends ControladorRest
 
     private function obterVisitasPorIdVisitante(Visitante $visitante): ResponseInterface
     {
-        $visitas = $this->repositorioVisita->obterTodasVisitasDeVisitante($visitante);
+        $visitas = $this->repositorioVisita->buscarTodasDeVisitante($visitante);
         if (!$visitas) {
             return new RespostaJson(404, json_encode(['error' => 'Nenhuma visita encontrada']));
         }
@@ -207,16 +207,16 @@ class ControladorVisita extends ControladorRest
             return new RespostaJson(400, json_encode(['error' => $this->ERROS[2]]));
         }
 
-        $quantidadeVisitas = $this->repositorioVisita->obterTotalVisitas($status);
+        $quantidadeVisitas = $this->repositorioVisita->obterTotal($status);
         if ($limite) {
             $resultado = $status
-                ? $this->repositorioVisita->obterTodasVisitas($status, new ParametroBusca($buscarPor, $limite, $offset))
-                : $this->repositorioVisita->obterTodasVisitas("", new ParametroBusca($buscarPor, $limite, $offset));
+                ? $this->repositorioVisita->buscarTodas($status, new ParametroBusca($buscarPor, $limite, $offset))
+                : $this->repositorioVisita->buscarTodas("", new ParametroBusca($buscarPor, $limite, $offset));
             $quantidadePagina = ceil($quantidadeVisitas / $limite);
         } else {
             $resultado = $status
-                ? $this->repositorioVisita->obterTodasVisitas($status, new ParametroBusca($buscarPor))
-                : $this->repositorioVisita->obterTodasVisitas("", new ParametroBusca($buscarPor));
+                ? $this->repositorioVisita->buscarTodas($status, new ParametroBusca($buscarPor))
+                : $this->repositorioVisita->buscarTodas("", new ParametroBusca($buscarPor));
             $quantidadePagina = 1;
         }
 

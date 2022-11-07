@@ -84,7 +84,7 @@ class ControladorVisitante extends ControladorRest
         $visitante->setCadastradoEm(new \DateTime());
         $visitante->setCadastradoPor($dados['idUsuario']);
 
-        $resultado = $this->repositorioVisitante->adicionarVisitante($visitante);
+        $resultado = $this->repositorioVisitante->criar($visitante);
         if (!$resultado) {
             return new RespostaJson(409, json_encode(['error' => $this->ERROS[4]]));
         }
@@ -143,7 +143,7 @@ class ControladorVisitante extends ControladorRest
         $visitante->setModificadoEm(new \DateTime());
         $visitante->setModificadoPor($dados['idUsuario']);
 
-        $resultado = $this->repositorioVisitante->alterarVisitante($visitante);
+        $resultado = $this->repositorioVisitante->atualizar($visitante);
         if (!$resultado) {
             return new RespostaJson(409, json_encode(['error' => $this->ERROS[6]]));
         }
@@ -200,21 +200,21 @@ class ControladorVisitante extends ControladorRest
             return new RespostaJson(400, json_encode(['error' => $this->ERROS[6]]));
         }
 
-        $quantidadeVisitantes = $this->repositorioVisitante->obterTotalVisitantes($pesquisa ?? '');
+        $quantidadeVisitantes = $this->repositorioVisitante->obterTotal($pesquisa ?? '');
         if ($limite) {
             $resultado = $pesquisa
-                ? $this->repositorioVisitante->buscarVisitantesComo(
+                ? $this->repositorioVisitante->buscarComo(
                     $pesquisa,
                     new ParametroBusca($buscarPor, $limite, $offset)
                 )
-                : $this->repositorioVisitante->buscarTodosVisitantes(
+                : $this->repositorioVisitante->buscarTodos(
                     new ParametroBusca($buscarPor, $limite, $offset)
                 );
             $quantidadePaginas = ceil($quantidadeVisitantes / $limite);
         } else {
             $resultado = $pesquisa
-                ? $this->repositorioVisitante->buscarVisitantesComo($pesquisa, new ParametroBusca($buscarPor))
-                : $this->repositorioVisitante->buscarTodosVisitantes(new ParametroBusca($buscarPor));
+                ? $this->repositorioVisitante->buscarComo($pesquisa, new ParametroBusca($buscarPor))
+                : $this->repositorioVisitante->buscarTodos(new ParametroBusca($buscarPor));
             $quantidadePaginas = 1;
         }
         $conteudoResposta = [

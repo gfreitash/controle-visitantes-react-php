@@ -8,28 +8,28 @@ use App\Visitantes\Models\Visitante;
 
 interface RepositorioVisita
 {
-    public function adicionarVisita(Visita $visita): bool|Visita;
+    public function criar(Visita $visita): bool|Visita;
 
     public function buscarPorId(int $id): bool|Visita;
 
-    public function alterarVisita(Visita $visita): bool;
+    public function atualizar(Visita $visita): bool;
 
-    public function removerVisitaPorId(int $id): bool;
+    public function removerPorId(int $id): bool;
 
-    public function obterTodasVisitas(
+    public function buscarTodas(
         string $status="",
         ParametroBusca $parametros = null
     ): array;
 
-    public function obterTodasVisitasDeVisitante(
+    public function buscarTodasDeVisitante(
         Visitante $visitante,
         string $status="",
         ParametroBusca $parametros=null
     ): array;
 
-    public function obterVisitantesAtivos(?ParametroBusca $parametros = null): array;
+    public function buscarVisitantesAtivos(?ParametroBusca $parametros = null): array;
 
-    public function obterTotalVisitas(?string $status=""): int;
+    public function obterTotal(?string $status=""): int;
 
     public static function obterRepositorioVisita(): RepositorioVisita;
 
