@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {Nav, Navbar, NavDropdown} from "react-bootstrap";
 
-import logo from "../assets/imgs/logo-light.png";
+import logo from "../assets/imgs/logo-light.webp";
 import {LinkContainer} from "react-router-bootstrap";
 import useInvalidSessionHandler from "../hooks/useInvalidSessionHandler";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";

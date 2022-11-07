@@ -8,7 +8,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faUser, faLock} from "@fortawesome/free-solid-svg-icons";
 
 import "../assets/css/login.css";
-import logo from "../assets/imgs/logo.png";
+import logo from "../assets/imgs/logo.webp";
 import axios from "../api/axios";
 
 export default function Login() {
@@ -97,7 +97,7 @@ export default function Login() {
     return (
         <div className="login__pagina">
             <div className="login__card">
-                <img src={logo} alt="logo" width="150px" height="115px"/>
+                <img src={logo} alt="logo" height="115px"/>
                 <br/>
                 <b>Controle de Visitantes</b>
                 <br/>
