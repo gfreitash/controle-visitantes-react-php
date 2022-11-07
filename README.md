@@ -1,6 +1,6 @@
 Controle de visitas e visitantes
 ---------------------------
----------------------------
+
 ## Introdução
 O projeto consiste em um sistema de controle de visitas e visitantes, em que é possível 
 cadastrar, consultar e modificar dados, além de emitir relatórios.
