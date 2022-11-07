@@ -7,14 +7,19 @@ import useInvalidSessionHandler from "../hooks/useInvalidSessionHandler";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import ModalRelatorioVisitas, {emitirRelatorioVisita} from "./ModalRelatorioVisitas";
 import ModalRelatorioVisitante, {emitirRelatorioVisitante} from "./ModalRelatorioVisitante";
+import ModalCadastroUsuario from "./ModalCadastroUsuario";
+import useAuth from "../hooks/useAuth";
 
 export default function Header(props) {
     const LOGOUT_URL = "/logout"
+
+    const {auth} = useAuth();
     const axiosPrivate = useAxiosPrivate();
     const handleInvalidSession = useInvalidSessionHandler();
 
     const [exibirModalRelVisita, setExibirModalRelVisita] = useState(false);
     const [exibirModalRelVisitante, setExibirModalRelVisitante] = useState(false);
+    const [exibirModalCadastroUsuario, setExibirModalCadastroUsuario] = useState(false);
 
     const handleLogout = async () => {
         try {
@@ -109,6 +114,15 @@ export default function Header(props) {
                 <div className="collapse navbar-collapse d-flex flex-row-reverse container-flex" id="navbarNav">
                     <Nav>
                         <NavDropdown title={props.usuario} align="end">
+                            {auth.funcao === 1 &&
+                                <>
+                                    <NavDropdown.Item onClick={()=>setExibirModalCadastroUsuario(true)}>
+                                        Cadastrar Usuário
+                                    </NavDropdown.Item>
+                                    <NavDropdown.Divider/>
+                                </>
+                            }
+
                             <LinkContainer to="/alterar-senha">
                                 <NavDropdown.Item>Alterar Senha</NavDropdown.Item>
                             </LinkContainer>
@@ -130,6 +144,11 @@ export default function Header(props) {
                     onFechar={setExibirModalRelVisitante}
                 />
             }
+            {exibirModalCadastroUsuario &&
+                <ModalCadastroUsuario
+                    exibir={exibirModalCadastroUsuario}
+                    onFechar={setExibirModalCadastroUsuario}
+                />}
         </header>
     )
 }

@@ -73,8 +73,9 @@ export default function Login() {
             const accessToken = response?.data?.accessToken ? "Bearer " + response?.data?.accessToken : null;
             const nome = response?.data?.nome;
             const id = response?.data?.id;
+            const funcao = response?.data?.funcao;
 
-            setAuth({nome, id, email, accessToken});
+            setAuth({nome, id, email, accessToken, funcao});
             setEmail("");
             setSenha("");
 

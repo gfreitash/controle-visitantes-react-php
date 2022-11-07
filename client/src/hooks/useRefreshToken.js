@@ -13,6 +13,7 @@ export default function useRefreshToken() {
             nome: response.data.nome,
             id: response.data.id,
             email: response.data.email,
+            funcao: response.data.funcao,
             accessToken: response.data.accessToken
         });
 
