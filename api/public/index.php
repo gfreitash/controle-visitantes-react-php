@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
 
 
 $request = FabricaRequest::createRequestFromGlobals();
-$caminho = "/".explode("/", $_SERVER['PATH_INFO'])[1];
+$caminho = "/".explode("/", $_SERVER['REQUEST_URI'])[1];
 $autorizacao = match (Rotas::ROTAS[$caminho]['autorizacao']) {
     Rotas::AUTORIZACAO[1] => $request->getHeader('Authorization')[0] ?? "",
     Rotas::AUTORIZACAO[2] => $request->getCookieParams()['jwt'] ?? "",
