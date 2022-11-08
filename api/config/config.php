@@ -6,9 +6,10 @@ $dotenv = Dotenv\Dotenv::createImmutable(__DIR__.'/..');
 $dotenv->load();
 
 //** Origens permitidas */
-const ORIGENS = [
-    "http://localhost:3000",
-];
+define(
+    "ORIGENS",
+    ["http://localhost:3000", "http://{$_ENV['IP_SERVIDOR']}:3000", "https://{$_ENV['IP_SERVIDOR']}:3000"]
+) ;
 
 /** O nome do banco de dados*/
 define("DB_NAME", $_ENV['DB_NAME']);
