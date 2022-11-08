@@ -14,7 +14,6 @@ export default function RequerAutenticacao() {
     const [carregando, setCarregando] = useState(true);
 
     useEffectOnce(() => {
-        console.log("RequerAutenticacao: useEffectOnce");
         const verificarLogin = async () => {
             try {
                 await refresh();

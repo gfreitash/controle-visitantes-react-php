@@ -36,3 +36,4 @@ yarn-error.log*
 /client/node_modules/
 /api/.tool-versions
 /client/build/
+/client/yarn.lock
