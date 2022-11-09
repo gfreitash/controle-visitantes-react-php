@@ -36,7 +36,8 @@ class ControladorDashboard extends ControladorRest
             //DateTime do dia atual
             $hoje = new DateTime();
             //DateTime dessa semana
-            $semana = ($hoje->sub(new \DateInterval("P" . $hoje->format('w') . "D")));
+            $dia = new DateTime($hoje->format('Y-m-d'));
+            $semana = ($dia->sub(new \DateInterval("P" . $dia->format('w') . "D")));
             //DateTime desse mês
             $mes = DateTime::createFromFormat('Y-m-d', date('Y-m-01'));
             //DateTime desse ano
