@@ -28,19 +28,23 @@ export default function NovaVisita() {
     const [buscaRealizada, setBuscaRealizada] = useState(false);
     const [alerta, setAlerta] = useState({tipo: "", mensagem: ""});
 
-    const conteudoTitulo = (
+    const conteudoTitulo = visitante?.cpf ? (
         <Link to={`/visitante?cpf=${visitante.cpf}`}>
             <button className="btn btn-dark btn-acao" type="button"
                     style={visitante.cpf ? {} : {display: "none"}}>
                 Editar visitante
             </button>
         </Link>
-    );
+    ) : (<></>);
 
     const onCpfValido = (codigoResposta, visitante) => {
-        setVisitante(visitante);
-        setBuscaRealizada(true);
-        setAlerta({tipo:"", mensagem: ""});
+        if (codigoResposta === 200) {
+            setVisitante(visitante);
+            setBuscaRealizada(true);
+            setAlerta({tipo:"", mensagem: ""});
+        } else {
+            setAlerta({tipo:"danger", mensagem: "Visitante não encontrado"});
+        }
     }
 
     async function handleSubmit(event) {
