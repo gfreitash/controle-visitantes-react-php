@@ -11,7 +11,7 @@ use Nyholm\Psr7\Response;
 class JwtHelper
 {
     private const ALGORITMO = "HS256";
-    private const TEMPO_VIDA_ACCESS_TOKEN = 60; // 1 minuto
+    private const TEMPO_VIDA_ACCESS_TOKEN = 60 * 3; // 3 minutos
     private const TEMPO_VIDA_REFRESH_TOKEN =  60 * 30; // 30 minutos
 
     public static function criarAccessToken(array $conteudo): ?string
