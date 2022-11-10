@@ -8,7 +8,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faUser, faLock} from "@fortawesome/free-solid-svg-icons";
 
 import "../assets/css/login.css";
-import logo from "../assets/imgs/logo.webp";
+import logo from "../assets/imgs/logo.png";
 import axios from "../api/axios";
 
 export default function Login() {
