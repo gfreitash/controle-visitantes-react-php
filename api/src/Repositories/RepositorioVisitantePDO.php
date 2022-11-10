@@ -97,17 +97,21 @@ class RepositorioVisitantePDO extends JoinableDataLayer implements RepositorioVi
 
     public function buscarComo($termo, ParametroBusca $parametros = null): array
     {
+        $where = "";
+        $params = "";
+
         if (DateTime::createFromFormat('d/m/Y', $termo)) {
             $termo = Utils::formatarData($termo, Utils::FORMATOS_DATA['date_local'], Utils::FORMATOS_DATA['date']);
-            $where = "cadastrado_em LIKE :termo";
-            $this->find($where, "termo=$termo%");
-        } else {
-            $where = "cpf LIKE :cpf OR nome like :nome";
+            $where .= "cadastrado_em LIKE :termo";
+            $params .= "termo=$termo%";
+        } elseif (strlen($termo) > 0) {
             $termo .= "%";
-            $this->find($where, "cpf=$termo&nome=$termo");
+            $where .= "cpf LIKE :cpf OR nome like :nome";
+            $params .= "cpf=$termo&nome=$termo";
         }
 
-        $this->definirDetalhesBusca($parametros);
+        [$where, $params] = $this->definirDetalhesBusca($parametros, $where, $params);
+        $this->find($where, $params);
 
         $resultado = $this->fetch(true);
         return $this->count() ? array_map(fn($rs) => $rs->data(), $resultado) : [];
@@ -119,11 +123,8 @@ class RepositorioVisitantePDO extends JoinableDataLayer implements RepositorioVi
         return $this->id;
     }
 
-    private function definirDetalhesBusca(?ParametroBusca $parametros = null): array
+    private function definirDetalhesBusca(?ParametroBusca $parametros = null, $where = "", $params = ""): array
     {
-        $where = "";
-        $params = "";
-
         if ($parametros?->ordenarPor) {
             $this->order(Utils::arrayOrdenacaoParaString($parametros->ordenarPor));
         }
@@ -134,19 +135,12 @@ class RepositorioVisitantePDO extends JoinableDataLayer implements RepositorioVi
             $this->offset($parametros->offset);
         }
         if ($parametros?->dataInicio) {
-            if (strlen($where) > 0) {
-                $where .= " AND ";
-            }
-
-            $where .= "cadastrado_em >= :dataInicio";
+            $where = Utils::concatWhere($where, "cadastrado_em >= :dataInicio");
             $params .=  strlen($params) > 0 ? "&" : "";
             $params .= "dataInicio={$parametros->dataInicio->format(Utils::FORMATOS_DATA['date'])}";
         }
         if ($parametros?->dataFim) {
-            if (strlen($where) > 0) {
-                $where .= " AND ";
-            }
-            $where .= "cadastrado_em <= :dataFim";
+            $where = Utils::concatWhere($where, "cadastrado_em <= :dataFim");
             $params .=  strlen($params) > 0 ? "&" : "";
             $params .= "dataFim={$parametros->dataFim->format(Utils::FORMATOS_DATA['date'])}";
         }
@@ -184,30 +178,59 @@ class RepositorioVisitantePDO extends JoinableDataLayer implements RepositorioVi
         return new RepositorioVisitantePDO();
     }
 
-    public function obterTotal(string $como = ""): int
+    public function obterTotal(string $como = "", ParametroBusca $parametros = null): int
     {
         $conexao = Conexao::criarConexao();
+        $where = "";
+        $params = [];
+
         if ($como) {
-            if (DateTime::createFromFormat('d/m/Y', $como)) {
-                $como = Utils::formatarData($como, Utils::FORMATOS_DATA['date_local'], Utils::FORMATOS_DATA['date']);
-                $where = "cadastrado_em LIKE :como";
-                $query = "SELECT COUNT(*) FROM tb_visitante WHERE $where";
-                $stmt = $conexao->prepare($query);
-                $stmt->bindValue(":como", $como."%");
+            if ($data = DateTime::createFromFormat('d/m/Y', $como)) {
+                if (strlen($where) > 0) {
+                    $where .= " AND ";
+                }
+
+                $como = $data->format(Utils::FORMATOS_DATA['date']);
+                $where .= "cadastrado_em LIKE :como";
+                $params['como'] = $como."%";
             } else {
+                if (strlen($where) > 0) {
+                    $where .= " AND ";
+                }
                 $como .= "%";
                 $where = "cpf LIKE :cpf OR nome LIKE :nome";
-                $query = "SELECT COUNT(*) FROM tb_visitante WHERE $where";
-                $stmt = $conexao->prepare($query);
-                $stmt->bindValue(":cpf", $como);
-                $stmt->bindValue(":nome", $como);
+                $params['cpf'] = $como;
+                $params['nome'] = $como;
             }
-        } else {
-            $query = "SELECT COUNT(*) FROM tb_visitante";
-            $stmt = $conexao->prepare($query);
         }
 
-        $stmt->execute();
+        if ($parametros?->dataInicio) {
+            if (strlen($where) > 0) {
+                $where .= " AND ";
+            }
+            $where .= "cadastrado_em >= :dataInicio";
+            $params['dataInicio'] = $parametros->dataInicio->format(Utils::FORMATOS_DATA['date']);
+        }
+        if ($parametros?->dataFim) {
+            if (strlen($where) > 0) {
+                $where .= " AND ";
+            }
+            $where .= "cadastrado_em <= :dataFim";
+            $params['dataFim'] = $parametros->dataFim->format(Utils::FORMATOS_DATA['date']);
+        }
+
+        $query = "SELECT COUNT(*) FROM tb_visitante";
+        if (strlen($where) > 0) {
+            $query .= " WHERE $where";
+        }
+        $stmt = $conexao->prepare($query);
+
+        if (!empty($params)) {
+            $stmt->execute($params);
+        } else {
+            $stmt->execute();
+        }
+
         return (int) $stmt->fetch()["COUNT(*)"];
     }
 }

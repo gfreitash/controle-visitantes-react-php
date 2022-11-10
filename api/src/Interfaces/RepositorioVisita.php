@@ -29,7 +29,7 @@ interface RepositorioVisita
 
     public function buscarVisitantesAtivos(?ParametroBusca $parametros = null): array;
 
-    public function obterTotal(?string $status=""): int;
+    public function obterTotal(?string $status="", ParametroBusca $parametros = null): int;
 
     public static function obterRepositorioVisita(): RepositorioVisita;
 

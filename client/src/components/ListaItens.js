@@ -1,4 +1,4 @@
-import React, {Children, useContext, useEffect, useLayoutEffect, useRef, useState} from "react";
+import React, {Children, useContext, useEffect, useRef, useState} from "react";
 import {Link, useNavigate} from "react-router-dom";
 
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
@@ -6,13 +6,43 @@ import useQuery from "../hooks/useQuery";
 import useInvalidSessionHandler from "../hooks/useInvalidSessionHandler";
 
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faSort, faSortDown, faSortUp} from "@fortawesome/free-solid-svg-icons";
+import {faSort, faSortDown, faSortUp, faSquareCaretDown, faSquareCaretUp} from "@fortawesome/free-solid-svg-icons";
 
 import "../assets/css/lista-itens.css";
+import "bootstrap/dist/js/bootstrap.bundle.min"
 import Paginador from "./Paginador";
 import ListaContext from "../context/ProvedorLista";
 
 const tiposHeader = ["limitado", "ilimitado", "data", "icone"];
+
+function paramsParaString(paramObj) {
+    let queryString = "";
+    for (const propriedade in paramObj) {
+        if (paramObj[propriedade].length > 0) {
+            queryString.length > 0 && (queryString += "&");
+            queryString += `${propriedade}=${paramObj[propriedade]}`
+        }
+    }
+
+    return queryString;
+}
+
+function obterQuery(parametro, pesquisa, ordenar, ordem, pagina, limite) {
+    let query = "";
+    const concatQuery = (propriedade, valor) => {
+        query.length > 0 && (query += "&");
+        query += `${propriedade}=${valor}`;
+    }
+
+    parametro?.length > 0 && (query += parametro);
+    pesquisa?.length > 0 && concatQuery("pesquisa", pesquisa);
+    ordenar?.length > 0 && concatQuery("ordenar", ordenar);
+    ordem?.length > 0 && concatQuery("ordem", ordem);
+    limite > 0 && concatQuery("limite", limite);
+    pagina > 0 && concatQuery("pagina", pagina);
+
+    return `?${query}`;
+}
 
 export default function ListaItens(props) {
     const axios = useAxiosPrivate();
@@ -20,28 +50,51 @@ export default function ListaItens(props) {
     const navigate = useNavigate();
     const handleInvalidSession = useInvalidSessionHandler();
 
-    const {pagina, setPagina, ordenar, setOrdenar, ordem, setOrdem, urls, setUrls, pesquisa, setPesquisa} = useContext(ListaContext);
+    const {setPagina, ordenar, setOrdenar, ordem, setOrdem, urls, setUrls, pesquisa, setPesquisa} = useContext(ListaContext);
     const permitirDisplayPesquisa = props.permitirPesquisa ? {display: "block"} : {display: "none"};
 
+    const [resultado, setResultado] = useState({});
+    const [parametro, setParametro] = useState("");
+    const [showAvancado, setShowAvancado] = useState(!!props.permitirPesquisa);
+    const parametroVazio = useRef(false);
     const pesquisaRef = useRef();
     const navegacaoSuperiorRef = useRef();
-    const [resultado, setResultado] = useState({});
 
     const ITENS_POR_PAGINA = 50;
     const QTD_COLUNAS = Children.count(props.tableHeaders.props.children);
-    const QUERY_STRING = `?pesquisa=${pesquisa || '""'}&ordenar=${ordenar}&ordem=${ordem}`;
+    const QUERY_STRING = obterQuery(parametro, pesquisa, ordenar, ordem);
+
+    const obterParametro = () => {
+        if (parametro.length > 0) {
+            parametroVazio.current = false;
+            return parametro;
+        } else if (parametroVazio.current) {
+            return "";
+        } else {
+            parametroVazio.current = false;
+            setParametro(props.parametro);
+            return paramsParaString(props.parametro);
+        }
+    }
 
     const handlePesquisar = (event) => {
         event.preventDefault();
 
-        let novaPesquisa = event.target.pesquisa.value === "" ? '""' : event.target.pesquisa.value;
-        const navegarPara = `${urls.pagina}?pesquisa=${novaPesquisa}&ordenar=${ordenar}&ordem=${ordem}&pagina=1`;
+        const novaPesquisa = event.target.pesquisa.value;
+        const query = obterQuery(parametro, novaPesquisa, ordenar, ordem, 1);
+        const navegarPara = `${urls.pagina}${query}`;
 
         setPagina(1);
         setPesquisa(novaPesquisa);
-        pesquisaRef.current.value = novaPesquisa !== '""' ? novaPesquisa : "";
+        pesquisaRef.current.value = novaPesquisa;
 
         navigate(navegarPara);
+    }
+
+    const handleParametroChange = (event) => {
+        parametroVazio.current = event.target.value === "";
+
+        setParametro(event.target.value);
     }
 
     const handleNavegacao = (_pagina) => {
@@ -50,33 +103,31 @@ export default function ListaItens(props) {
         }
     }
 
-    useLayoutEffect(() => {
-        setOrdenar(props.defaultOrdenar);
-        setOrdem(props.defaultOrdem);
-        setUrls(props.urls);
-    }, []);
-
     useEffect(() => {
         let isMounted = true;
         const controlador = new AbortController();
 
         let paginaAtual = parseInt(query.get("pagina")) || 1;
-        let ordenarPor = query.get("ordenar") || ordenar;
-        let ordemPor = query.get("ordem") || ordem;
-        let pesquisaPor = query.get("pesquisa") || '""';
+        let ordenarPor = query.get("ordenar") || ordenar || props.defaultOrdenar;
+        let ordemPor = query.get("ordem") || ordem || props.defaultOrdem;
+        let pesquisaPor = query.get("pesquisa") ?? "";
+        let param = obterParametro();
+
         setPagina(paginaAtual);
         setOrdenar(ordenarPor);
         setOrdem(ordemPor);
         setUrls(props.urls);
         setPesquisa(pesquisaPor);
-        pesquisaRef.current.value = pesquisaPor !== '""' ? pesquisaPor : "";
+        setParametro(param);
+        pesquisaRef.current.value = pesquisaPor;
 
-        const url = `${props.urls.backend}?pesquisa=${pesquisaPor}&ordenar=${ordenarPor}&ordem=${ordemPor}&limite=${ITENS_POR_PAGINA}&pagina=${paginaAtual}`;
+        const params = obterQuery(param, pesquisaPor, ordenarPor, ordemPor, paginaAtual, ITENS_POR_PAGINA);
+        const url = `${props.urls.backend}${params}`;
 
         const obterVisitantes = async () => {
             try {
                 const resposta = await axios.get(url, {signal: controlador.signal});
-                isMounted && setResultado(resposta.data);
+                setResultado(resposta.data);
             } catch (e) {
                 if (e.response?.status === 401) {
                     handleInvalidSession();
@@ -88,29 +139,53 @@ export default function ListaItens(props) {
             }
         }
 
-        obterVisitantes();
+        isMounted && obterVisitantes();
 
         return () => {
             isMounted = false;
             controlador.abort();
         }
-    },[pagina, ordem, ordenar, pesquisa, props.urls]);
+    },[query, props]);
 
     return (
         <>
             <div className="conteudo width--95">
-                <form onSubmit={handlePesquisar} style={permitirDisplayPesquisa}>
+                <form onSubmit={handlePesquisar}>
                     <div className="campo-pesquisa">
-                        <label className="campo-pesquisa__elemento" htmlFor="pesquisa">Pesquisar</label>
+                        <label className="campo-pesquisa__elemento" htmlFor="pesquisa" style={permitirDisplayPesquisa}>
+                            Pesquisar
+                        </label>
                         <input className="form-control campo-pesquisa__elemento" type="text" name="pesquisa" id="pesquisa"
-                               placeholder={props.placeholder} ref={pesquisaRef}/>
+                               placeholder={props.placeholder} ref={pesquisaRef} style={permitirDisplayPesquisa}/>
+
+                        <button type="button" className="btn btn-dark campo-pesquisa__elemento" data-bs-toggle="collapse"
+                                data-bs-target="#parametros-container" aria-expanded="true" aria-controls="parametros-container"
+                                onClick={()=>setShowAvancado(!showAvancado)}
+                        >
+                            <div className="d-flex align-items-center">
+                                Avançado
+                                <FontAwesomeIcon icon={showAvancado ? faSquareCaretDown : faSquareCaretUp} className="ms-2"/>
+                            </div>
+                        </button>
                         <button type="submit" className="btn btn-primary campo-pesquisa__elemento">
                             Pesquisar
                         </button>
                     </div>
+
+                    <div className="accordion">
+                        <div id="parametros-container" aria-labelledby="headingOne"
+                             className={`accordion-collapse collapse mt-2 ${!props.permitirPesquisa && parametro ? "show"  : ""}`}>
+                                <div className="campo-pesquisa campo-pesquisa__avancado p-1">
+                                    <label className="campo-pesquisa__elemento">Parametros: </label>
+                                    <input id="parametro" name="parametro" className="form-control campo-pesquisa__elemento"
+                                           value={parametro} placeholder="param1=valor1&param2=valor2..."
+                                           type="text" onChange={handleParametroChange}/>
+                                </div>
+                        </div>
+                    </div>
                 </form>
 
-                <hr style={permitirDisplayPesquisa}/>
+                <hr/>
 
                 <div className="navegacao" ref={navegacaoSuperiorRef}>
                     <Paginador

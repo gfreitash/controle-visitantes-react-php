@@ -183,14 +183,16 @@ class ControladorVisita extends ControladorRest
         }
 
         $status = $params[2];
+        $dataInicio = key_exists('dataInicio', $queries) ? Utils::tentarCriarDateTime($queries['dataInicio']) : null;
+        $dataFim = key_exists('dataFim', $queries) ? Utils::tentarCriarDateTime($queries['dataFim']) : null;
         $ordenarPor = $queries['ordenar'] ?? 'data_visita';
         $ordem = $queries['ordem'] ?? 'DESC';
-        $limite = $queries['limite'] ?? null;
+        $limite = $queries['limite'] ?? 0;
         $pagina = $queries['pagina'] ?? 1;
         $buscarPor = RepositorioVisitaPDO::BUSCAR_POR;
         $buscarPorJoin = RepositorioVisitaPDO::BUSCAR_POR_JOIN;
 
-        $offset = ($pagina - 1) * $limite;
+        $offset = $limite ? ($pagina - 1) * $limite : 0;
         if (array_key_exists($ordenarPor, $buscarPor) && in_array(strtoupper($ordem), ['ASC', 'DESC'])) {
             $buscarPor = [$buscarPor[$ordenarPor] => $ordem] + $buscarPorJoin;
         } else {
@@ -202,23 +204,22 @@ class ControladorVisita extends ControladorRest
         } elseif (strtoupper($status) === "FECHADAS") {
             $status = Visita::STATUS[0];
         } elseif (strtoupper($status) === "TODAS" || strtoupper($status) === "") {
-            $status = null;
+            $status = "";
         } else {
             return new RespostaJson(400, json_encode(['error' => $this->ERROS[2]]));
         }
 
-        $quantidadeVisitas = $this->repositorioVisita->obterTotal($status);
-        if ($limite) {
-            $resultado = $status
-                ? $this->repositorioVisita->buscarTodas($status, new ParametroBusca($buscarPor, $limite, $offset))
-                : $this->repositorioVisita->buscarTodas("", new ParametroBusca($buscarPor, $limite, $offset));
-            $quantidadePagina = ceil($quantidadeVisitas / $limite);
-        } else {
-            $resultado = $status
-                ? $this->repositorioVisita->buscarTodas($status, new ParametroBusca($buscarPor))
-                : $this->repositorioVisita->buscarTodas("", new ParametroBusca($buscarPor));
-            $quantidadePagina = 1;
-        }
+
+        $quantidadeVisitas = $this->repositorioVisita->obterTotal(
+            $status,
+            new ParametroBusca(dataInicio: $dataInicio, dataFim: $dataFim)
+        );
+        $resultado = $this->repositorioVisita->buscarTodas(
+            $status,
+            new ParametroBusca($buscarPor, $limite, $offset, $dataInicio, $dataFim)
+        );
+        $quantidadePagina = $limite ? ceil($quantidadeVisitas / $limite) : 1;
+
 
         $conteudoResposta = [
             'quantidadeTotal' => $quantidadeVisitas,

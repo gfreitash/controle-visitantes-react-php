@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Link, useParams} from "react-router-dom";
 
 import useInvalidSessionHandler from "../hooks/useInvalidSessionHandler";
@@ -19,8 +19,10 @@ import {mascaraCPF} from "../assets/js/dados-visitante";
 import Titulo from "../components/Titulo";
 import Alerta from "../components/Alerta";
 import ListaItens, {TableData, TableHeader} from "../components/ListaItens";
+import useQuery from "../hooks/useQuery";
 
 export default function ListaVisitas() {
+    const query = useQuery();
     const axios = useAxiosPrivate();
     const handleInvalidSession = useInvalidSessionHandler();
     const {auth} = useAuth();
@@ -34,6 +36,7 @@ export default function ListaVisitas() {
 
     const [exibirModal, setExibirModal] = useState(false);
     const [objetoModal, setObjetoModal] = useState({});
+    const [parametro, setParametro] = useState({dataInicio: "", dataFim: ""});
     const [alerta, setAlerta] = useState({tipo: "", mensagem: ""});
 
     const titulo = (id) => {
@@ -48,6 +51,13 @@ export default function ListaVisitas() {
                 return "Visitas";
         }
     }
+
+    useEffect(() => {
+        let dataInicio = query.get("dataInicio") ?? "";
+        let dataFim = query.get("dataFim") ?? "";
+
+        setParametro({dataInicio, dataFim});
+    }, [query]);
 
     const handleAbrirModal = (visita) => {
         return () => {
@@ -203,9 +213,9 @@ export default function ListaVisitas() {
             <ProvedorLista>
                 <ListaItens
                     urls={urls}
+                    parametro={parametro}
                     defaultOrdenar="data_visita"
                     defaultOrdem="DESC"
-                    placeholderPesquisa="Insira um cpf, nome ou data da visita"
                     tableHeaders={tableHeaders}
                     mapFunction={mapFunction}
                 />

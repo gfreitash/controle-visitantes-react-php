@@ -4,6 +4,7 @@ namespace App\Visitantes\Controllers;
 
 use App\Visitantes\Helpers\Utils;
 use App\Visitantes\Interfaces\ControladorRest;
+use App\Visitantes\Interfaces\RepositorioVisita;
 use App\Visitantes\Interfaces\RepositorioVisitante;
 use App\Visitantes\Models\DadosVisitante;
 use App\Visitantes\Models\ParametroBusca;
@@ -22,11 +23,14 @@ class ControladorVisitante extends ControladorRest
         3 => 'CPF inválido',
         4 => 'Já existe um visitante cadastrado com esse CPF',
         5 => 'Já existe outro visitante cadastrado com esse CPF',
-        6 => 'Ordem ou tipo de ordenação inválida'
+        6 => 'Ordem ou tipo de ordenação inválida',
+        7 => 'Status inválido'
     ];
 
-    public function __construct(private readonly RepositorioVisitante $repositorioVisitante)
-    {
+    public function __construct(
+        private readonly RepositorioVisitante $repositorioVisitante,
+        private readonly RepositorioVisita $repositorioVisita
+    ) {
         parent::__construct();
     }
 
@@ -186,9 +190,14 @@ class ControladorVisitante extends ControladorRest
 
     private function obterTodosVisitantes(array $queries): RespostaJson
     {
-        $pesquisa = $this->filtrarPesquisa($queries['pesquisa']);
+        $statusValidos = ['ativos', 'cadastrados'];
+
+        $dataInicio = key_exists('dataInicio', $queries) ? Utils::tentarCriarDateTime($queries['dataInicio']) : null;
+        $dataFim = key_exists('dataFim', $queries) ? Utils::tentarCriarDateTime($queries['dataFim']) : null;
+        $status = key_exists('status', $queries) ? $queries['status'] : null;
+        $pesquisa = key_exists('pesquisa', $queries) ? $this->filtrarPesquisa($queries['pesquisa']) : "";
         $ordenarPor = $queries['ordenar'] ?? 'nome';
-        $limite = $queries['limite'] ?? null;
+        $limite = $queries['limite'] ?? 0;
         $pagina = $queries['pagina'] ?? 1;
         $ordem = $queries['ordem'] ?? 'ASC';
         $buscarPor = RepositorioVisitantePDO::BUSCAR_POR;
@@ -200,23 +209,29 @@ class ControladorVisitante extends ControladorRest
             return new RespostaJson(400, json_encode(['error' => $this->ERROS[6]]));
         }
 
-        $quantidadeVisitantes = $this->repositorioVisitante->obterTotal($pesquisa ?? '');
-        if ($limite) {
-            $resultado = $pesquisa
-                ? $this->repositorioVisitante->buscarComo(
-                    $pesquisa,
-                    new ParametroBusca($buscarPor, $limite, $offset)
-                )
-                : $this->repositorioVisitante->buscarTodos(
-                    new ParametroBusca($buscarPor, $limite, $offset)
-                );
-            $quantidadePaginas = ceil($quantidadeVisitantes / $limite);
-        } else {
-            $resultado = $pesquisa
-                ? $this->repositorioVisitante->buscarComo($pesquisa, new ParametroBusca($buscarPor))
-                : $this->repositorioVisitante->buscarTodos(new ParametroBusca($buscarPor));
-            $quantidadePaginas = 1;
+        if ($status && !in_array($status, $statusValidos)) {
+            return new RespostaJson(400, json_encode(['error' => $this->ERROS[7]]));
         }
+
+        if ($status === $statusValidos[0]) {
+            $quantidadeVisitantes = count($this->repositorioVisita->buscarVisitantesAtivos(
+                new ParametroBusca(dataInicio: $dataInicio, dataFim: $dataFim)
+            ));
+            $resultado = $this->repositorioVisita->buscarVisitantesAtivos(
+                new ParametroBusca($buscarPor, $limite, $offset, $dataInicio, $dataFim)
+            );
+        } else {
+            $quantidadeVisitantes = $this->repositorioVisitante->obterTotal(
+                parametros: new ParametroBusca(dataInicio: $dataInicio, dataFim: $dataFim)
+            );
+            $resultado = $this->repositorioVisitante->buscarComo(
+                $pesquisa,
+                new ParametroBusca($buscarPor, $limite, $offset, $dataInicio, $dataFim)
+            );
+        }
+
+        $quantidadePaginas = $limite ? ceil($quantidadeVisitantes / $limite) : 1;
+
         $conteudoResposta = [
             'quantidadeTotal' => $quantidadeVisitantes,
             'quantidadePaginas' => $quantidadePaginas,

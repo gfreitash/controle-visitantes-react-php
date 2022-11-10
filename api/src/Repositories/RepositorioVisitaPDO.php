@@ -195,26 +195,43 @@ class RepositorioVisitaPDO extends JoinableDataLayer implements RepositorioVisit
     }
 
 
-    public function obterTotal(?string $status = ""): int
+    public function obterTotal(?string $status = "", ParametroBusca $parametros = null): int
     {
         $conexao = Conexao::criarConexao();
-        if ($status) {
-            if (in_array($status, Visita::STATUS)) {
-                if ($status === Visita::STATUS[0]) {
-                    $where = "finalizada_em IS NOT NULL";
-                } else {
-                    $where = "finalizada_em IS NULL";
-                }
+        $where = "";
+        $params = [];
+        if ($status && in_array($status, Visita::STATUS)) {
+            if ($status === Visita::STATUS[0]) {
+                $where .= "finalizada_em IS NOT NULL";
             } else {
-                return 0;
+                $where .= "finalizada_em IS NULL";
             }
-
-            $query = "SELECT COUNT(*) FROM tb_visita WHERE $where";
-        } else {
-            $query = "SELECT COUNT(*) FROM tb_visita";
         }
 
-        $stmt = $conexao->query($query);
+        if ($parametros?->dataInicio) {
+            if (strlen($where) > 0) {
+                $where .= " AND ";
+            }
+            $where .= "data_visita >= :dataInicio";
+            $params['dataInicio'] = $parametros->dataInicio->format('Y-m-d');
+        }
+        if ($parametros?->dataFim) {
+            if (strlen($where) > 0) {
+                $where .= " AND ";
+            }
+            $where .= "data_visita <= :dataFim";
+            $params['dataFim'] = $parametros->dataFim->format('Y-m-d');
+        }
+
+        $query = "SELECT COUNT(*) FROM tb_visita";
+        if (strlen($where) > 0) { $query .= " WHERE $where"; }
+        $stmt = $conexao->prepare($query);
+
+        if (!empty($params)) {
+            $stmt->execute($params);
+        } else {
+            $stmt->execute();
+        }
         return (int) $stmt->fetch()["COUNT(*)"];
     }
 

@@ -21,7 +21,7 @@ interface RepositorioVisitante
 
     public function buscarComo($termo, ParametroBusca $parametros = null): array;
 
-    public function obterTotal(string $como=""): int;
+    public function obterTotal(string $como="", ParametroBusca $parametros = null): int;
 
     public static function obterRepositorioVisitante(): RepositorioVisitante;
 

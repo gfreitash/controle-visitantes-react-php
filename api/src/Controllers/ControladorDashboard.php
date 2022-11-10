@@ -27,6 +27,7 @@ class ControladorDashboard extends ControladorRest
      */
     public function get(ServerRequestInterface $request): ResponseInterface
     {
+        $formatoData = 'd/m/Y';
         $dados = [
             'visitas' => [],
             'visitantes' => [],
@@ -35,13 +36,17 @@ class ControladorDashboard extends ControladorRest
         try {
             //DateTime do dia atual
             $hoje = new DateTime();
+            $dados['hoje'] = $hoje->format($formatoData);
             //DateTime dessa semana
             $dia = new DateTime($hoje->format('Y-m-d'));
             $semana = ($dia->sub(new \DateInterval("P" . $dia->format('w') . "D")));
+            $dados['semana'] = $semana->format($formatoData);
             //DateTime desse mês
             $mes = DateTime::createFromFormat('Y-m-d', date('Y-m-01'));
+            $dados['mes'] = $mes->format($formatoData);
             //DateTime desse ano
             $ano = DateTime::createFromFormat('Y-m-d', date('Y-01-01'));
+            $dados['ano'] = $ano->format($formatoData);
         } catch (\Exception $e) {
             return new RespostaJson(500, $e->getMessage());
         }

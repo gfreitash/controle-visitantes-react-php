@@ -7,12 +7,18 @@
 
 .campo-pesquisa {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
 }
 
 .campo-pesquisa__elemento {
     margin: .2rem;
+}
+
+.campo-pesquisa__avancado {
+    background-color: #e6eced;
+    border: 1px solid #cdd8da;
+    border-radius: 0;
 }
 
 .navegacao {

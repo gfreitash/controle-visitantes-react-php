@@ -13,6 +13,15 @@ class Utils
             'datetime_local_curto' => 'd/m/Y H:i',
             'date_local' => 'd/m/Y'];
 
+    public static function concatWhere(string $where, string $valor)
+    {
+        if (strlen($where) > 0) {
+            $where .= " AND ";
+        }
+        $where .= $valor;
+        return $where;
+    }
+
     public static function arrayOrdenacaoParaString(array $arrayAssoc): string
     {
         $append = "";

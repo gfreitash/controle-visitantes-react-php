@@ -23,8 +23,9 @@ export default function Inicio() {
     const larguraCaixaVisitante = "24.5%";
     const larguraCaixaVisita = "19.5%";
     const linkVisitasAberto = "/lista-visitas/abertas";
-    const linkVisitas = "/lista-visitas/todas";
-    const linkVisitantes = "/lista-visitantes"
+    const linkVisitas = "/lista-visitas/todas?dataInicio=";
+    const linkVisitantesAtivos = "/lista-visitantes?status=ativos&dataInicio=";
+    const linkVisitantesCadastrados = "/lista-visitantes?status=cadastrados&dataInicio=";
 
     const usuario = auth?.nome ? toTitleCase(auth.nome).split(' ')[0] : "";
 
@@ -85,10 +86,10 @@ export default function Inicio() {
                         <Card.Body>
                             <div className= "d-flex justify-content-between">
                                 <Caixa link={linkVisitasAberto} conteudo="Em aberto" contador={dados?.visitas.abertas} razao="2:1" width={larguraCaixaVisita}/>
-                                <Caixa link={linkVisitas} conteudo="Nesse dia" contador={dados?.visitas.hoje} razao="2:1" width={larguraCaixaVisita} color="#0d442a"/>
-                                <Caixa link={linkVisitas} conteudo="Nessa semana" contador={dados?.visitas.semana} razao="2:1" width={larguraCaixaVisita} color="#0d442a"/>
-                                <Caixa link={linkVisitas} conteudo="Nesse mês" contador={dados?.visitas.mes} razao="2:1" width={larguraCaixaVisita} color="#0d442a"/>
-                                <Caixa link={linkVisitas} conteudo="Nesse ano" contador={dados?.visitas.ano} razao="2:1" width={larguraCaixaVisita} color="#0d442a"/>
+                                <Caixa link={linkVisitas+dados?.hoje} conteudo="Nesse dia" contador={dados?.visitas.hoje} razao="2:1" width={larguraCaixaVisita} color="#0d442a"/>
+                                <Caixa link={linkVisitas+dados?.semana} conteudo="Nessa semana" contador={dados?.visitas.semana} razao="2:1" width={larguraCaixaVisita} color="#0d442a"/>
+                                <Caixa link={linkVisitas+dados?.mes} conteudo="Nesse mês" contador={dados?.visitas.mes} razao="2:1" width={larguraCaixaVisita} color="#0d442a"/>
+                                <Caixa link={linkVisitas+dados?.ano} conteudo="Nesse ano" contador={dados?.visitas.ano} razao="2:1" width={larguraCaixaVisita} color="#0d442a"/>
                             </div>
                         </Card.Body>
                     </Card>
@@ -123,10 +124,10 @@ export default function Inicio() {
                             (
                                 <>
                                     <div className= "d-flex justify-content-between">
-                                        <Caixa link={linkVisitantes} conteudo="Nesse dia" contador={dados?.visitantes.ativos.hoje} razao="2:1" width={larguraCaixaVisitante} color="#043d48"/>
-                                        <Caixa link={linkVisitantes} conteudo="Nessa semana" contador={dados?.visitantes.ativos.semana} razao="2:1" width={larguraCaixaVisitante} color="#043d48"/>
-                                        <Caixa link={linkVisitantes} conteudo="Nesse mês" contador={dados?.visitantes.ativos.mes} razao="2:1" width={larguraCaixaVisitante} color="#043d48"/>
-                                        <Caixa link={linkVisitantes} conteudo="Nesse ano" contador={dados?.visitantes.ativos.ano} razao="2:1" width={larguraCaixaVisitante} color="#043d48"/>
+                                        <Caixa link={linkVisitantesAtivos+dados?.hoje} conteudo="Nesse dia" contador={dados?.visitantes.ativos.hoje} razao="2:1" width={larguraCaixaVisitante} color="#043d48"/>
+                                        <Caixa link={linkVisitantesAtivos+dados?.semana} conteudo="Nessa semana" contador={dados?.visitantes.ativos.semana} razao="2:1" width={larguraCaixaVisitante} color="#043d48"/>
+                                        <Caixa link={linkVisitantesAtivos+dados?.mes} conteudo="Nesse mês" contador={dados?.visitantes.ativos.mes} razao="2:1" width={larguraCaixaVisitante} color="#043d48"/>
+                                        <Caixa link={linkVisitantesAtivos+dados?.ano} conteudo="Nesse ano" contador={dados?.visitantes.ativos.ano} razao="2:1" width={larguraCaixaVisitante} color="#043d48"/>
                                     </div>
                                 </>
                             )
@@ -134,10 +135,10 @@ export default function Inicio() {
                         {abaVisitanteAtiva === "cadastrados" &&
                             <>
                                 <div className= "d-flex justify-content-between">
-                                    <Caixa link={linkVisitantes} conteudo="Nesse dia" contador={dados?.visitantes.cadastrados.hoje} razao="2:1" width={larguraCaixaVisitante} color="#0D2744"/>
-                                    <Caixa link={linkVisitantes} conteudo="Nessa semana" contador={dados?.visitantes.cadastrados.semana} razao="2:1" width={larguraCaixaVisitante} color="#0D2744"/>
-                                    <Caixa link={linkVisitantes} conteudo="Nesse mês" contador={dados?.visitantes.cadastrados.mes} razao="2:1" width={larguraCaixaVisitante} color="#0D2744"/>
-                                    <Caixa link={linkVisitantes} conteudo="Nesse ano" contador={dados?.visitantes.cadastrados.ano} razao="2:1" width={larguraCaixaVisitante} color="#0D2744"/>
+                                    <Caixa link={linkVisitantesCadastrados+dados?.hoje} conteudo="Nesse dia" contador={dados?.visitantes.cadastrados.hoje} razao="2:1" width={larguraCaixaVisitante} color="#0D2744"/>
+                                    <Caixa link={linkVisitantesCadastrados+dados?.semana} conteudo="Nessa semana" contador={dados?.visitantes.cadastrados.semana} razao="2:1" width={larguraCaixaVisitante} color="#0D2744"/>
+                                    <Caixa link={linkVisitantesCadastrados+dados?.mes} conteudo="Nesse mês" contador={dados?.visitantes.cadastrados.mes} razao="2:1" width={larguraCaixaVisitante} color="#0D2744"/>
+                                    <Caixa link={linkVisitantesCadastrados+dados?.ano} conteudo="Nesse ano" contador={dados?.visitantes.cadastrados.ano} razao="2:1" width={larguraCaixaVisitante} color="#0D2744"/>
                                 </div>
                             </>
 

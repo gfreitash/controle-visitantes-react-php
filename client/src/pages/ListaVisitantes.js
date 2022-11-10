@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {Link} from "react-router-dom";
 
 
@@ -10,8 +10,20 @@ import {mascaraCPF} from "../assets/js/dados-visitante";
 import Titulo from "../components/Titulo";
 import ListaItens, {TableData, TableHeader} from "../components/ListaItens";
 import {ProvedorLista} from "../context/ProvedorLista";
+import useQuery from "../hooks/useQuery";
 
 export default function ListaVisitantes() {
+    const query = useQuery();
+    const [parametro, setParametro] = useState({dataInicio: "", dataFim: "", status: ""});
+
+    useEffect(() => {
+        let dataInicio = query.get("dataInicio") ?? "";
+        let dataFim = query.get("dataFim") ?? "";
+        let status = query.get("status") ?? "";
+
+        setParametro({dataInicio, dataFim, status});
+    }, [query]);
+
     const tableHeaders = (
         <>
             <TableHeader id="cpf" tipo="limitado" titulo="CPF"/>
@@ -64,6 +76,7 @@ export default function ListaVisitantes() {
             <ProvedorLista>
                 <ListaItens
                     urls={{pagina: "/lista-visitantes", backend: "/visitante", adicionarItem: "/novo-cadastro"}}
+                    parametro={parametro}
                     defaultOrdenar="cadastrado_em"
                     defaultOrdem="DESC"
                     placeholder="Insira um cpf, nome ou data de cadastro"
