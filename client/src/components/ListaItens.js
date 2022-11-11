@@ -55,7 +55,7 @@ export default function ListaItens(props) {
 
     const [resultado, setResultado] = useState({});
     const [parametro, setParametro] = useState("");
-    const [showAvancado, setShowAvancado] = useState(!!props.permitirPesquisa);
+    const [showAvancado, setShowAvancado] = useState(false);
     const parametroVazio = useRef(false);
     const pesquisaRef = useRef();
     const navegacaoSuperiorRef = useRef();
@@ -63,6 +63,7 @@ export default function ListaItens(props) {
     const ITENS_POR_PAGINA = 50;
     const QTD_COLUNAS = Children.count(props.tableHeaders.props.children);
     const QUERY_STRING = obterQuery(parametro, pesquisa, ordenar, ordem);
+    const MOSTRAR_PARAMS = showAvancado || (parametro.length > 0 && paramsParaString(props.parametro) === parametro);
 
     const obterParametro = () => {
         if (parametro.length > 0) {
@@ -93,7 +94,7 @@ export default function ListaItens(props) {
 
     const handleParametroChange = (event) => {
         parametroVazio.current = event.target.value === "";
-
+        setShowAvancado(true);
         setParametro(event.target.value);
     }
 
@@ -164,7 +165,7 @@ export default function ListaItens(props) {
                         >
                             <div className="d-flex align-items-center">
                                 Avançado
-                                <FontAwesomeIcon icon={showAvancado ? faSquareCaretDown : faSquareCaretUp} className="ms-2"/>
+                                <FontAwesomeIcon icon={showAvancado ? faSquareCaretUp : faSquareCaretDown} className="ms-2"/>
                             </div>
                         </button>
                         <button type="submit" className="btn btn-primary campo-pesquisa__elemento">
@@ -174,7 +175,7 @@ export default function ListaItens(props) {
 
                     <div className="accordion">
                         <div id="parametros-container" aria-labelledby="headingOne"
-                             className={`accordion-collapse collapse mt-2 ${!props.permitirPesquisa && parametro ? "show"  : ""}`}>
+                             className={`accordion-collapse collapse mt-2 ${MOSTRAR_PARAMS? "show"  : ""}`}>
                                 <div className="campo-pesquisa campo-pesquisa__avancado p-1">
                                     <label className="campo-pesquisa__elemento">Parametros: </label>
                                     <input id="parametro" name="parametro" className="form-control campo-pesquisa__elemento"

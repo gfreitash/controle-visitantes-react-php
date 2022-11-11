@@ -162,7 +162,7 @@ class ControladorVisitante extends ControladorRest
 
     private function filtrarPesquisa(?string $pesquisa): string
     {
-        return $pesquisa && $pesquisa !== '""' ? $pesquisa : '';
+        return $pesquisa && $pesquisa !== '""' ? str_replace(["-", "."], "", $pesquisa) : '';
     }
 
     private function obterVisitantePorId(string $id): bool|Visitante
@@ -222,7 +222,8 @@ class ControladorVisitante extends ControladorRest
             );
         } else {
             $quantidadeVisitantes = $this->repositorioVisitante->obterTotal(
-                parametros: new ParametroBusca(dataInicio: $dataInicio, dataFim: $dataFim)
+                $pesquisa,
+                new ParametroBusca(dataInicio: $dataInicio, dataFim: $dataFim)
             );
             $resultado = $this->repositorioVisitante->buscarComo(
                 $pesquisa,
