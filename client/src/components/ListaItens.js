@@ -63,7 +63,7 @@ export default function ListaItens(props) {
     const ITENS_POR_PAGINA = 50;
     const QTD_COLUNAS = Children.count(props.tableHeaders.props.children);
     const QUERY_STRING = obterQuery(parametro, pesquisa, ordenar, ordem);
-    const MOSTRAR_PARAMS = showAvancado || (parametro.length > 0 && paramsParaString(props.parametro) === parametro);
+    const MOSTRAR_PARAMS = (parametro.length > 0 && paramsParaString(props.parametro) === parametro);
 
     const obterParametro = () => {
         if (parametro.length > 0) {
