@@ -8,7 +8,11 @@ $dotenv->load();
 //** Origens permitidas */
 define(
     "ORIGENS",
-    ["http://localhost:3000", "http://{$_ENV['IP_SERVIDOR']}:3000", "https://{$_ENV['IP_SERVIDOR']}:3000"]
+    [
+        "http://localhost:3000",
+        "{$_ENV['PROTOCOLO']}://{$_SERVER['SERVER_ADDR']}:{$_ENV['PORTA_CORS']}",
+        "{$_ENV['PROTOCOLO']}://{$_ENV['IP_SERVIDOR']}:{$_ENV['PORTA_CORS']}"
+    ]
 ) ;
 
 /** O nome do banco de dados*/
