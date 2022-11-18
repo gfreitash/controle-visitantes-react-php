@@ -11,6 +11,7 @@ use App\Visitantes\Models\ParametroBusca;
 use App\Visitantes\Models\RespostaJson;
 use App\Visitantes\Models\Visitante;
 use App\Visitantes\Repositories\RepositorioVisitantePDO;
+use Exception;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -72,10 +73,15 @@ class ControladorVisitante extends ControladorRest
             return new RespostaJson(400, json_encode(['error' => $this->ERROS[3]]));
         }
 
-        $upload = $request->getUploadedFiles()['fotoInput'];
-        $uploadBinario = $upload->getStream()->getContents() ?? null;
-        $mime = $upload->getClientMediaType() ?? null;
-        $foto = Utils::converterBinarioParaBase64($uploadBinario, $mime);
+        try {
+            $upload = $request->getUploadedFiles()['fotoInput'];
+            $uploadBinario = $upload?->getStream()->getContents() ?? null;
+            $mime = $upload?->getClientMediaType() ?? null;
+            $foto = Utils::converterBinarioParaBase64($uploadBinario, $mime);
+        } catch (Exception) {
+            $foto = null;
+        }
+
         $dataNascimento = \DateTime::createFromFormat(Utils::FORMATOS_DATA['date'], $dados['dataNascimento']) ?? null;
 
         $dadosVisitante = new DadosVisitante($dados['cpf'], $dados['nome']);
