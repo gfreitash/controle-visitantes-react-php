@@ -146,7 +146,7 @@ export default function ListaItens(props) {
             isMounted = false;
             controlador.abort();
         }
-    },[query, props]);
+    },[query]);
 
     return (
         <>

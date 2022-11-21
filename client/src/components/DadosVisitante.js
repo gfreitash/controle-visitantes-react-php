@@ -42,10 +42,8 @@ export default function DadosVisitante(props) {
         event.target.classList.remove("is-invalid");
 
         cpf.setAttribute("maxlength", "14");
-        setTimeout(()=> {
-            cpf.value=Funcoes.mascaraCPF(cpf.value);
-            if(cpf.value.length === 14) Funcoes.validaCPF(cpf, onCpfValido);
-        }, 1);
+        cpf.value=Funcoes.mascaraCPF(cpf.value);
+        if(cpf.value.length === 14) Funcoes.validaCPF(cpf, onCpfValido);
 
         setFormData({...formData, cpf: cpf.value});
     }
@@ -108,6 +106,9 @@ export default function DadosVisitante(props) {
     useEffect(() => {
         if(props.onCpfValido && props.cpf && Funcoes.cpfValido(props.cpf)) {
             setFormData({...formData, cpf: Funcoes.mascaraCPF(props.cpf)});
+            cpfRef.current.value = Funcoes.mascaraCPF(props.cpf);
+            preencherCampos();
+            cpfRef.current?.classList.remove("is-invalid");
         }
     },[props.cpf]);
 
@@ -119,10 +120,10 @@ export default function DadosVisitante(props) {
             }
             preencherCampos();
             setPlaceholder({
-                    cpf: "",
-                    nome: "",
-                    identidade: "",
-                    expedidor: "",
+                cpf: "",
+                nome: "",
+                identidade: "",
+                expedidor: "",
             });
         } else {
             setPlaceholder({
@@ -133,11 +134,6 @@ export default function DadosVisitante(props) {
             })
         }
     },[disabled, readOnly]);
-
-    useEffect(() => {
-        preencherCampos();
-        cpfRef.current?.classList.remove("is-invalid");
-    },[formData.cpf]);
 
     return (
         <>
