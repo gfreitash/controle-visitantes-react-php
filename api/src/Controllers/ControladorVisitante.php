@@ -73,14 +73,16 @@ class ControladorVisitante extends ControladorRest
             return new RespostaJson(400, json_encode(['error' => $this->ERROS[3]]));
         }
 
-        try {
-            $upload = $request->getUploadedFiles()['fotoInput'];
+
+        $upload = $request->getUploadedFiles()['fotoInput'];
+        if ($upload->getSize() > 0) {
             $uploadBinario = $upload?->getStream()->getContents() ?? null;
             $mime = $upload?->getClientMediaType() ?? null;
             $foto = Utils::converterBinarioParaBase64($uploadBinario, $mime);
-        } catch (Exception) {
+        } else {
             $foto = null;
         }
+
 
         $dataNascimento = \DateTime::createFromFormat(Utils::FORMATOS_DATA['date'], $dados['dataNascimento']) ?? null;
 
@@ -129,7 +131,7 @@ class ControladorVisitante extends ControladorRest
         }
 
         $upload = $request->getUploadedFiles()['fotoInput'];
-        if ($upload) {
+        if ($upload->getSize() > 0) {
             $uploadBinario = $upload->getStream()->getContents() ?? null;
             $mime = $upload->getClientMediaType() ?? null;
             $foto = Utils::converterBinarioParaBase64($uploadBinario, $mime);
