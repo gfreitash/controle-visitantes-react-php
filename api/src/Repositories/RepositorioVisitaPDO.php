@@ -59,7 +59,7 @@ class RepositorioVisitaPDO extends JoinableDataLayer implements RepositorioVisit
     public function criar(Visita $visita): bool|Visita
     {
         $arr = $visita->paraArray();
-        unset($arr['modificada_em'], $arr['modificada_por'], $arr['cpf'], $arr['nome']);
+        unset($arr['id'], $arr['modificada_em'], $arr['modificada_por'], $arr['cpf'], $arr['nome']);
         $this->atribuirPropriedades($arr);
 
         if ($this->save()) {
@@ -83,7 +83,7 @@ class RepositorioVisitaPDO extends JoinableDataLayer implements RepositorioVisit
         $arr = $visita->paraArray();
         unset($arr['cpf'], $arr['nome']);
 
-        /** @var RepositorioVisitaPDO|null $vs */
+        /** @var JoinableDataLayer|null $vs */
         $vs = $this->findById($arr['id']);
         if ($vs) {
             $vs->atribuirPropriedades($arr);
@@ -245,6 +245,10 @@ class RepositorioVisitaPDO extends JoinableDataLayer implements RepositorioVisit
     {
         if ($vs instanceof RepositorioVisitaPDO) {
             $vs->obterVisitante();
+        }
+
+        if (gettype($vs) === "array") {
+            $vs = (object) $vs;
         }
 
         $dados_visita = new DadosVisita(

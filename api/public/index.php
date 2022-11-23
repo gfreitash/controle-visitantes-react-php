@@ -13,7 +13,7 @@ if (!empty($_SERVER['HTTP_ORIGIN'])) {
     $origem = in_array($_SERVER['HTTP_ORIGIN'], ORIGENS, true) ?
         $_SERVER['HTTP_ORIGIN']
         : ORIGENS[0];
-    $maxAge = 60 * 60 * 24; // 1 dia
+    $maxAge = 60 * 60; // 1 hora
 
     http_response_code(200);
     header("Access-Control-Allow-Origin: $origem"); //Origem permitida

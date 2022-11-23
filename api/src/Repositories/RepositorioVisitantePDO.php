@@ -150,6 +150,10 @@ class RepositorioVisitantePDO extends JoinableDataLayer implements RepositorioVi
 
     private function criarVisitante(DataLayer|array $vs): Visitante
     {
+        if (gettype($vs) === 'array') {
+            $vs = (object) $vs;
+        }
+
         $dadosVisitante = new DadosVisitante($vs->cpf, $vs->nome);
         $dadosVisitante->setIdentidade($vs->identidade);
         $dadosVisitante->setExpedidor($vs->expedidor);
