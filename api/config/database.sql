@@ -1,11 +1,11 @@
-CREATE TABLE `tb_funcao`
+CREATE TABLE IF NOT EXISTS `tb_funcao`
 (
     `id`     smallint(6) NOT NULL AUTO_INCREMENT,
     `funcao` varchar(25) NOT NULL,
     PRIMARY KEY (`id`)
 );
 
-CREATE TABLE `tb_usuario`
+CREATE TABLE IF NOT EXISTS `tb_usuario`
 (
     `id` smallint(6) NOT NULL AUTO_INCREMENT,
     `funcao` smallint(6) NOT NULL,
@@ -20,7 +20,7 @@ CREATE TABLE `tb_usuario`
     CONSTRAINT `tb_usuario_ibfk_1` FOREIGN KEY (`funcao`) REFERENCES `tb_funcao` (`id`)
 );
 
-CREATE TABLE `tb_visitante`
+CREATE TABLE IF NOT EXISTS `tb_visitante`
 (
     `id`              int(11)     NOT NULL AUTO_INCREMENT,
     `cpf`             varchar(11) NOT NULL,
@@ -41,7 +41,7 @@ CREATE TABLE `tb_visitante`
     CONSTRAINT `tb_visitante_ibfk_2` FOREIGN KEY (`modificado_por`) REFERENCES `tb_usuario` (`id`)
 );
 
-CREATE TABLE `tb_visita`
+CREATE TABLE IF NOT EXISTS `tb_visita`
 (
     `id`             int(11)     NOT NULL AUTO_INCREMENT,
     `visitante_id`   int(11)     NOT NULL,
@@ -66,8 +66,26 @@ CREATE TABLE `tb_visita`
     CONSTRAINT `tb_visita_ibfk_4` FOREIGN KEY (`visitante_id`) REFERENCES `tb_visitante` (`id`)
 );
 
-INSERT INTO tb_funcao (funcao) VALUES ('ADMINISTRADOR');
-INSERT INTO tb_funcao (funcao) VALUES ('USUARIO');
+CREATE TABLE IF NOT EXISTS `tb_observacao`
+(
+    `id`          int(11)     NOT NULL AUTO_INCREMENT,
+    `visita_id`   int(11)     NOT NULL,
+    `observacao`  varchar(255) NOT NULL,
+    `adicionada_em` datetime    NOT NULL,
+    `adicionada_por` smallint(6) NOT NULL,
+    `modificada_em` datetime     DEFAULT NULL,
+    `modificada_por` smallint(6)  DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    KEY `cadastrada_por` (`adicionada_por`),
+    KEY `modificada_por` (`modificada_por`),
+    KEY `visita_id` (`visita_id`),
+    CONSTRAINT `tb_observacao_ibfk_1` FOREIGN KEY (`adicionada_por`) REFERENCES `tb_usuario` (`id`),
+    CONSTRAINT `tb_observacao_ibfk_2` FOREIGN KEY (`modificada_por`) REFERENCES `tb_usuario` (`id`),
+    CONSTRAINT `tb_observacao_ibfk_3` FOREIGN KEY (`visita_id`) REFERENCES `tb_visita` (`id`)
+);
+
+INSERT INTO tb_funcao (id, funcao) VALUES (1, 'ADMINISTRADOR');
+INSERT INTO tb_funcao (id, funcao) VALUES (2, 'USUARIO');
 
 /* Usuário administrador com senha padrão 123 */
 INSERT INTO tb_usuario (funcao, nome, email, senha) VALUES (1, 'ADMINISTRADOR', 'adm@adm.com', '$2y$13$oO4CWt40erbWk9xvqFACjO228OJ2gI4g1EIHDkizuRXQOPSvYZbGO');

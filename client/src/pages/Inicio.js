@@ -11,6 +11,7 @@ import {Link} from "react-router-dom";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faSquarePlus} from "@fortawesome/free-solid-svg-icons";
 import Alerta from "../components/Alerta";
+import Tip from "../components/Tip";
 
 export default function Inicio() {
     const {auth} = useAuth();
@@ -78,7 +79,8 @@ export default function Inicio() {
 
                             <div className="align-self-center inicio__icone d-flex align-items-center justify-content-center">
                                 <Link to="/nova-visita">
-                                    <FontAwesomeIcon icon={faSquarePlus} size="xl"/>
+                                    <Tip label="Cadastrar nova visita" cursor="pointer"
+                                         trigger={<FontAwesomeIcon icon={faSquarePlus} size="xl"/>}/>
                                 </Link>
                             </div>
                         </Card.Header>
@@ -114,7 +116,8 @@ export default function Inicio() {
 
                         <div className="align-self-center inicio__icone d-flex align-items-center justify-content-center">
                             <Link to="/novo-cadastro">
-                                <FontAwesomeIcon icon={faSquarePlus} size="xl"/>
+                                <Tip label="Cadastar novo visitante" cursor="pointer"
+                                     trigger={<FontAwesomeIcon icon={faSquarePlus} size="xl"/>}/>
                             </Link>
                         </div>
                     </Card.Header>

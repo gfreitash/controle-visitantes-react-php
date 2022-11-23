@@ -14,7 +14,11 @@ import useQuery from "../hooks/useQuery";
 
 export default function ListaVisitantes() {
     const query = useQuery();
-    const [parametro, setParametro] = useState({dataInicio: "", dataFim: "", status: ""});
+    const [parametro, setParametro] = useState({
+        dataInicio: query.get("dataInicio") ?? "",
+        dataFim: query.get("dataFim") ?? "",
+        status: query.get("status") ?? ""
+    });
 
     useEffect(() => {
         let dataInicio = query.get("dataInicio") ?? "";
@@ -31,8 +35,8 @@ export default function ListaVisitantes() {
             <TableHeader id="data_nascimento" tipo="data" titulo="Data de nascimento"/>
             <TableHeader id="cadastrado_em" tipo="data" titulo="Cadastrado em"/>
             <TableHeader id="modificado_em" tipo="data" titulo="Modificado em"/>
-            <TableHeader id="nova_visita" tipo="icone" icone={faBuilding}/>
-            <TableHeader id="detalhes" tipo="icone" icone={faUser}/>
+            <TableHeader id="nova_visita" tipo="icone" icone={faBuilding} tooltip="Adicionar visitante"/>
+            <TableHeader id="detalhes" tipo="icone" icone={faUser} tooltip="Detalhes do visitante"/>
         </>
     );
 
@@ -55,12 +59,12 @@ export default function ListaVisitantes() {
                 <TableData tipo="data">{cadastrado_em?.toLocaleString()}</TableData>
                 <TableData tipo="data">{modificado_em?.toLocaleString()}</TableData>
 
-                <TableData tipo="icone">
+                <TableData tipo="icone" tooltip="Adicionar visitante">
                     <Link to={`/nova-visita?cpf=${visitante.cpf}`}>
                         <FontAwesomeIcon icon={faCirclePlus}/>
                     </Link>
                 </TableData>
-                <TableData tipo="icone">
+                <TableData tipo="icone" tooltip="Detalhes do visitante">
                     <Link to={`/visitante?cpf=${visitante.cpf}`}>
                         <FontAwesomeIcon icon={faPenToSquare}/>
                     </Link>
@@ -76,13 +80,18 @@ export default function ListaVisitantes() {
             <ProvedorLista>
                 <ListaItens
                     urls={{pagina: "/lista-visitantes", backend: "/visitante", adicionarItem: "/novo-cadastro"}}
+                    labelAdicionar="Cadastrar novo visitante"
                     parametro={parametro}
                     defaultOrdenar="cadastrado_em"
                     defaultOrdem="DESC"
-                    placeholder="Insira um cpf, nome ou data de cadastro"
                     tableHeaders={tableHeaders}
                     mapFunction={mapFunction}
+                    placeholder="Insira um cpf, nome ou data de cadastro"
                     permitirPesquisa
+                    paginacao
+                    tableHover
+                    tableStriped
+                    tableDark
                 />
             </ProvedorLista>
         </>

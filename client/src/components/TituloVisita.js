@@ -12,6 +12,7 @@ import {
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 import Titulo from "./Titulo";
+import Tip from "./Tip";
 
 export default function TituloVisita(props) {
     const [icone, setIcone] = React.useState(faSpinner);
@@ -37,10 +38,13 @@ export default function TituloVisita(props) {
         }
     }, [props]);
 
+    const iconeEditar = <FontAwesomeIcon icon={faPenToSquare} className="fa-2xl me-3 interativo" onClick={props.onEditar}/>;
+    const iconeFinalizar = <FontAwesomeIcon icon={faPersonWalkingDashedLineArrowRight} className="fa-2xl interativo" onClick={props.onFinalizar}/>
+
     const conteudoTitulo = status === "aberta" && (
         <div>
-            <FontAwesomeIcon icon={faPenToSquare} className="fa-2xl me-3 interativo" onClick={props.onEditar}/>
-            <FontAwesomeIcon icon={faPersonWalkingDashedLineArrowRight} className="fa-2xl interativo" onClick={props.onFinalizar}/>
+            <Tip label="Editar visita" trigger={iconeEditar}/>
+            <Tip label="Finalizar visita" trigger={iconeFinalizar}/>
         </div>
     )
 

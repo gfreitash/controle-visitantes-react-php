@@ -13,13 +13,22 @@ class Utils
             'datetime_local_curto' => 'd/m/Y H:i',
             'date_local' => 'd/m/Y'];
 
-    public static function concatWhere(string $where, string $valor)
+    public static function concatWhere(string $where, string $valor): string
     {
         if (strlen($where) > 0) {
             $where .= " AND ";
         }
         $where .= $valor;
         return $where;
+    }
+
+    public static function concatParam(string $params, $valor): string
+    {
+        if (strlen($params) > 0) {
+            $params .= "&";
+        }
+        $params .= $valor;
+        return $params;
     }
 
     public static function arrayOrdenacaoParaString(array $arrayAssoc): string

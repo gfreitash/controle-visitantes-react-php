@@ -12,8 +12,10 @@ import "../assets/css/lista-itens.css";
 import "bootstrap/dist/js/bootstrap.bundle.min"
 import Paginador from "./Paginador";
 import ListaContext from "../context/ProvedorLista";
+import Table from "react-bootstrap/Table";
+import Tip from "./Tip";
 
-const tiposHeader = ["limitado", "ilimitado", "data", "icone"];
+const tiposHeader = ["limitado", "limitado-maior", "limitado-menor", "ilimitado", "data", "icone"];
 
 function paramsParaString(paramObj) {
     let queryString = "";
@@ -50,20 +52,27 @@ export default function ListaItens(props) {
     const navigate = useNavigate();
     const handleInvalidSession = useInvalidSessionHandler();
 
-    const {setPagina, ordenar, setOrdenar, ordem, setOrdem, urls, setUrls, pesquisa, setPesquisa} = useContext(ListaContext);
-    const permitirDisplayPesquisa = props.permitirPesquisa ? {display: "block"} : {display: "none"};
+    const {
+        setPagina,
+        ordenar, setOrdenar,
+        ordem, setOrdem,
+        urls, setUrls,
+        pesquisa, setPesquisa,
+        parametro, setParametro
+    } = useContext(ListaContext);
+    const permitirDisplayPesquisa = props.permitirPesquisa ? {} : {display: "none"};
+    const permitirDisplayCamposPesquisa = !props.permitirPesquisa && !props.paginacao ? {display: "none"} : {};
 
     const [resultado, setResultado] = useState({});
-    const [parametro, setParametro] = useState("");
     const [showAvancado, setShowAvancado] = useState(false);
     const parametroVazio = useRef(false);
     const pesquisaRef = useRef();
     const navegacaoSuperiorRef = useRef();
 
-    const ITENS_POR_PAGINA = 50;
+    const ITENS_POR_PAGINA = props.quantidadeItens ?? props.semLimite ? 0 : 35;
     const QTD_COLUNAS = Children.count(props.tableHeaders.props.children);
     const QUERY_STRING = obterQuery(parametro, pesquisa, ordenar, ordem);
-    const MOSTRAR_PARAMS = (parametro.length > 0 && paramsParaString(props.parametro) === parametro);
+    const MOSTRAR_PARAMS = ((props.permitirPesquisa || props.paginacao) && parametro.length > 0 && paramsParaString(props.parametro) === parametro);
 
     const obterParametro = () => {
         if (parametro.length > 0) {
@@ -146,13 +155,13 @@ export default function ListaItens(props) {
             isMounted = false;
             controlador.abort();
         }
-    },[query]);
+    },[query, props.recarregar]);
 
     return (
         <>
-            <div className="conteudo width--95">
+            <div className="conteudo width--100">
                 <form onSubmit={handlePesquisar}>
-                    <div className="campo-pesquisa">
+                    <div className="campo-pesquisa" style={permitirDisplayCamposPesquisa}>
                         <label className="campo-pesquisa__elemento" htmlFor="pesquisa" style={permitirDisplayPesquisa}>
                             Pesquisar
                         </label>
@@ -176,57 +185,61 @@ export default function ListaItens(props) {
                     <div className="accordion">
                         <div id="parametros-container" aria-labelledby="headingOne"
                              className={`accordion-collapse collapse mt-2 ${MOSTRAR_PARAMS? "show"  : ""}`}>
-                                <div className="campo-pesquisa campo-pesquisa__avancado p-1">
-                                    <label className="campo-pesquisa__elemento">Parametros: </label>
-                                    <input id="parametro" name="parametro" className="form-control campo-pesquisa__elemento"
-                                           value={parametro} placeholder="param1=valor1&param2=valor2..."
-                                           type="text" onChange={handleParametroChange}/>
-                                </div>
+                            <div className="campo-pesquisa campo-pesquisa__avancado p-1">
+                                <label className="campo-pesquisa__elemento">Parametros: </label>
+                                <input id="parametro" name="parametro" className="form-control campo-pesquisa__elemento"
+                                       value={parametro} placeholder="param1=valor1&param2=valor2..."
+                                       type="text" onChange={handleParametroChange}/>
+                            </div>
                         </div>
                     </div>
                 </form>
 
-                <hr/>
+                <hr style={permitirDisplayCamposPesquisa}/>
 
                 <div className="navegacao" ref={navegacaoSuperiorRef}>
+                    {props.paginacao &&
+                        <Paginador
+                            urlPagina={urls.pagina}
+                            queryString={QUERY_STRING}
+                            paginaAtual={resultado.paginaAtual}
+                            quantidadePaginas={resultado.quantidadePaginas}
+                            handleNavegacao={handleNavegacao}
+                        />
+                    }
+
+                    {
+                        urls.adicionarItem ? (
+                            <Link to={`${urls.adicionarItem}`}>
+                                <button type="button" className="btn btn-dark">{props.labelAdicionar ?? "Adicionar"}</button>
+                            </Link>
+                        ) : ""
+                    }
+                </div>
+
+                <Table hover={props.tableHover} striped={props.tableStriped} bordered={props.tableBordered} borderless={props.tableBorderless}>
+                    <thead>
+                    <tr className={props.tableDark ? "table-dark" : ""}>
+                        {props.tableHeaders}
+                    </tr>
+                    </thead>
+                    <tbody className={props.tableDivider ? "table-group-divider" : ""}>
+                    {resultado.quantidadeTotal > 0
+                        ? resultado.dados.map(props.mapFunction)
+                        : <tr><td className="sem-resultado" colSpan={QTD_COLUNAS}>Nenhum item encontrado</td></tr>}
+                    </tbody>
+                </Table>
+
+                {props.paginacao &&
                     <Paginador
+                        foco={navegacaoSuperiorRef}
                         urlPagina={urls.pagina}
                         queryString={QUERY_STRING}
                         paginaAtual={resultado.paginaAtual}
                         quantidadePaginas={resultado.quantidadePaginas}
                         handleNavegacao={handleNavegacao}
                     />
-
-                    {
-                        urls.adicionarItem ? (
-                            <Link to={`${urls.adicionarItem}`}>
-                                <button type="button" className="btn btn-dark">Adicionar</button>
-                            </Link>
-                        ) : ""
-                    }
-                </div>
-
-                <table className="table table-hover table-striped">
-                    <thead>
-                    <tr className="table-dark">
-                        {props.tableHeaders}
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {resultado.quantidadeTotal > 0
-                        ? resultado.dados.map(props.mapFunction)
-                        : <tr><td className="sem-resultado" colSpan={QTD_COLUNAS}>Nenhum item encontrado</td></tr>}
-                    </tbody>
-                </table>
-
-                <Paginador
-                    foco={navegacaoSuperiorRef}
-                    urlPagina={urls.pagina}
-                    queryString={QUERY_STRING}
-                    paginaAtual={resultado.paginaAtual}
-                    quantidadePaginas={resultado.quantidadePaginas}
-                    handleNavegacao={handleNavegacao}
-                />
+                }
             </div>
         </>
     )
@@ -234,7 +247,7 @@ export default function ListaItens(props) {
 
 export function TableHeader(props) {
     const navigate = useNavigate();
-    const {setPagina, ordenar, setOrdenar, ordem, setOrdem, urls, pesquisa} = useContext(ListaContext);
+    const {setPagina, ordenar, setOrdenar, ordem, setOrdem, urls, pesquisa, parametro} = useContext(ListaContext);
 
     function getOrdemIcone(campo) {
         if (campo === ordenar) {
@@ -250,7 +263,8 @@ export function TableHeader(props) {
         }
 
         let ordenarPor = event.currentTarget.id.toLowerCase();
-        let navegarPara = `${urls.pagina}?pesquisa=${pesquisa}&ordenar=${ordenarPor}&ordem=${ordemPor}&pagina=1`;
+        let queryString = obterQuery(parametro, pesquisa, ordenarPor, ordemPor, 1);
+        let navegarPara = `${urls.pagina}${queryString}`;
 
         setOrdem(ordemPor);
         setOrdenar(ordenarPor);
@@ -264,7 +278,15 @@ export function TableHeader(props) {
     }
 
     const titulo = props.titulo ?? "";
-    const icone = props.icone ? <FontAwesomeIcon icon={props.icone}/> : "";
+    let icone = "";
+    if (props.icone) {
+        let handleClick = props.handleClick ?? null;
+        if (props.tamanho) {
+            icone = <FontAwesomeIcon icon={props.icone} size={props.tamanho} onClick={handleClick}/>
+        } else {
+            icone = <FontAwesomeIcon icon={props.icone} onClick={handleClick}/>
+        }
+    }
 
     return props.tipo !== "icone"
         ? (
@@ -276,9 +298,14 @@ export function TableHeader(props) {
             </th>
         )
         : (
-            <th id={props.id} className={`${props.tipo} icone__th`}>
-                {titulo}
-                {icone}
+            <th id={props.id} className={`${props.tipo} icone__th${props.iconePreto ? "--preto" : ""}`}>
+                {props.tooltip ?
+                    (
+                        <Tip label={props.tooltip} trigger={<>{titulo}{icone}</>} cursor={props.cursor ?? false}/>
+                    ) : (
+                        <>{titulo}{icone}</>
+                    )
+                }
             </th>
         )
 }
@@ -288,9 +315,15 @@ export function TableData(props) {
         return;
     }
 
-    return (
+    const tableData = (conteudo) => (
         <td className={props.tipo}>
-            {props.children}
+            {conteudo}
         </td>
     )
+
+    if(props.tooltip) {
+        return tableData(<Tip label={props.tooltip} trigger={props.children} cursor={props.cursor ?? false}/>)
+    }
+
+    return tableData(props.children);
 }

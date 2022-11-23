@@ -89,7 +89,7 @@ export default function RegistroVisita(props) {
             isMounted = false;
             controlador.abort();
         }
-    }, [props]);
+    }, [props.cadastradaPor, props.cadastradaEm, props.modificadaPor, props.modificadaEm, props.finalizadaPor, props.finalizadaEm]);
 
     return (
         <div className="form-linha">

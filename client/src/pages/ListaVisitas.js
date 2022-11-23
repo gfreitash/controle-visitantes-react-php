@@ -9,9 +9,8 @@ import {ProvedorLista} from "../context/ProvedorLista";
 import {Modal} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {
-    faBuildingUser, faLock,
+    faBuildingUser, faClipboard, faDoorOpen, faLock, faNotesMedical,
     faPenToSquare,
-    faPersonWalking,
     faPersonWalkingDashedLineArrowRight
 } from "@fortawesome/free-solid-svg-icons";
 
@@ -36,8 +35,11 @@ export default function ListaVisitas() {
 
     const [exibirModal, setExibirModal] = useState(false);
     const [objetoModal, setObjetoModal] = useState({});
-    const [parametro, setParametro] = useState({dataInicio: "", dataFim: ""});
     const [alerta, setAlerta] = useState({tipo: "", mensagem: ""});
+    const [parametro, setParametro] = useState({
+        dataInicio: query.get("dataInicio") ?? "",
+        dataFim: query.get("dataFim") ?? ""
+    });
 
     const titulo = (id) => {
         switch (id) {
@@ -161,8 +163,9 @@ export default function ListaVisitas() {
             <TableHeader id="motivo_visita" tipo="ilimitado" titulo="Motivo da visita"/>
             <TableHeader id="data_visita" tipo="data" titulo="Data da visita"/>
             <TableHeader id="finalizada_em" tipo="data" titulo="Finalizada em"/>
-            <TableHeader id="detalhes" tipo="icone" icone={faBuildingUser}/>
-            <TableHeader id="finalizar" tipo="icone" icone={faPersonWalking}/>
+            <TableHeader id="detalhes" tipo="icone" icone={faBuildingUser} tooltip={"Detalhes da visita"}/>
+            <TableHeader id="nova_observacao" tipo="icone" icone={faClipboard} tooltip={"Nova observação"}/>
+            <TableHeader id="finalizar" tipo="icone" icone={faDoorOpen} tooltip={"Status da visita"}/>
         </>
     )
 
@@ -184,23 +187,32 @@ export default function ListaVisitas() {
                 <TableData tipo="data">{data_visita?.toLocaleString()}</TableData>
                 <TableData tipo="data">{finalizada_em?.toLocaleString()}</TableData>
 
-                <TableData tipo="icone">
+                <TableData tipo="icone" tooltip="Detalhes da visita">
                     <Link to={`/visita?id=${visita.id}`}>
                         <FontAwesomeIcon icon={faPenToSquare}/>
                     </Link>
                 </TableData>
-                <TableData tipo="icone">
-                    {!visita.finalizada_em
-                        ? (
+
+                <TableData tipo="icone" tooltip="Nova observação">
+                    <Link to={`/visita?id=${visita.id}&adicionarObservacao=true`}>
+                        <FontAwesomeIcon icon={faNotesMedical}/>
+                    </Link>
+                </TableData>
+
+                {!visita.finalizada_em
+                    ? (
+                        <TableData tipo="icone" tooltip="Finalizar visita">
                             <FontAwesomeIcon icon={faPersonWalkingDashedLineArrowRight}
                                              style={{cursor: "pointer"}}
                                              onClick={handleAbrirModal(visita)}/>
-                        )
-                        : (
+                        </TableData>
+                    )
+                    : (
+                        <TableData tipo="icone" tooltip="Visita finalizada">
                             <FontAwesomeIcon icon={faLock}/>
-                        )
-                    }
-                </TableData>
+                        </TableData>
+                    )
+                }
             </tr>
         )
     }
@@ -209,15 +221,21 @@ export default function ListaVisitas() {
         <>
             <Titulo>{titulo(id)}</Titulo>
             <hr/>
+
             <Alerta alerta={alerta} setAlerta={setAlerta}/>
             <ProvedorLista>
                 <ListaItens
                     urls={urls}
+                    labelAdicionar="Cadastrar nova visita"
                     parametro={parametro}
                     defaultOrdenar="data_visita"
                     defaultOrdem="DESC"
                     tableHeaders={tableHeaders}
                     mapFunction={mapFunction}
+                    paginacao
+                    tableHover
+                    tableStriped
+                    tableDark
                 />
             </ProvedorLista>
             {modalFinalizarVisita}

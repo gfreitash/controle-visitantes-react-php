@@ -8,10 +8,18 @@ export function ProvedorLista(props) {
     const [ordem, setOrdem] = useState("");
     const [urls, setUrls] = useState({pagina: "", backend: ""});
     const [pesquisa, setPesquisa] = useState('""');
+    const [parametro, setParametro] = useState("");
 
     return (
         <ListaContext.Provider value={
-            {pagina, setPagina, ordenar, setOrdenar, ordem, setOrdem, urls, setUrls, pesquisa, setPesquisa}
+            {
+                pagina, setPagina,
+                ordenar, setOrdenar,
+                ordem, setOrdem,
+                urls, setUrls,
+                pesquisa, setPesquisa,
+                parametro, setParametro
+            }
         }>
             {props.children}
         </ListaContext.Provider>

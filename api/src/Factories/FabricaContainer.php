@@ -2,8 +2,10 @@
 
 namespace App\Visitantes\Factories;
 
+use App\Visitantes\Interfaces\RepositorioObservacao;
 use App\Visitantes\Interfaces\RepositorioVisita;
 use App\Visitantes\Interfaces\RepositorioVisitante;
+use App\Visitantes\Repositories\RepositorioObservacaoPDO;
 use App\Visitantes\Repositories\RepositorioVisitantePDO;
 use App\Visitantes\Repositories\RepositorioVisitaPDO;
 use DI\Container;
@@ -27,6 +29,9 @@ class FabricaContainer
             },
             RepositorioVisita::class => function () {
                 return RepositorioVisitaPDO::obterRepositorioVisita();
+            },
+            RepositorioObservacao::class => function () {
+                return RepositorioObservacaoPDO::obterRepositorioObservacao();
             }
         ]);
         try {

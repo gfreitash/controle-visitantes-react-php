@@ -1,3 +1,9 @@
+.tabela-wrapper {
+    border: .1rem solid #b2b6bb;
+    border-radius: .45rem;
+    padding: 0.2rem;
+}
+
 .conteudo {
     display: flex;
     flex-direction: column;
@@ -52,16 +58,21 @@ th:hover {
     margin-right: .5rem;
 }
 
-th > svg {
+th.icone__th svg {
     color: white;
     margin: 0 .2rem;
+}
+th.icone__th--preto > svg {
+    color: black;
+    margin: 0 .3rem;
 }
 
 td {
     vertical-align: middle;
+    overflow-wrap:break-word;
 }
 
-td > a > svg {
+td svg {
     color: black;
 }
 
@@ -73,8 +84,18 @@ table .limitado {
     min-width: 8.5rem;
 }
 
+table .limitado-maior {
+    width: 11.5rem;
+    min-width: 11.5rem;
+}
+
+table .limitado-menor {
+    width: 4.5rem;
+    min-width: 4.5rem;
+}
+
 table .data {
-    width: 6.5rem;
+    width: 7rem;
 }
 
 table .icone {
@@ -82,12 +103,16 @@ table .icone {
     text-align: center;
 }
 
-table .icone__th {
+.icone__th, .icone__th--preto {
     cursor: auto;
 }
 
+.icone__th--preto:hover {
+    color: var(--bs-body-color);
+}
+
 .sem-resultado {
-    font-size: large;
+    font-size: small;
     font-weight: lighter;
     font-style: italic;
     text-align: center;

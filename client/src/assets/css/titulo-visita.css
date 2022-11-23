@@ -10,7 +10,7 @@
     margin: 0;
 }
 
-a > svg {
+.status-visita a > svg {
     color: #fff;
     margin: 0 .5rem;
 }
