@@ -122,7 +122,7 @@ class ControladorObservacao extends ControladorRest
         $parametro = new ParametroBusca($ordenacao, dataInicio: $dataInicio, dataFim: $dataFim);
 
         $observacoes = $this->repositorioObservacao->buscarTodasDeVisita($visita, $parametro);
-        trigger_error(print_r($observacoes, true));
+
         foreach ($observacoes as $observacao) {
             if ($observacao->adicionada_por) {
                 $observacao->adicionada_por = $this->repositorioUsuario
