@@ -65,7 +65,7 @@ class ControladorUsuario extends ControladorRest
             $senha,
         );
 
-        $id = $this->repositorioUsuario->criarUsuario($usuario);
+        $id = $this->repositorioUsuario->criar($usuario);
         if (!$id) {
             return new RespostaJson(500, json_encode(['error' => 'Erro interno']));
         }
@@ -103,7 +103,7 @@ class ControladorUsuario extends ControladorRest
 
         $hash = password_hash($dados['novaSenha'], PASSWORD_DEFAULT, ['cost' => 13]);
         $usuario->setSenha($hash);
-        $resultado = $this->repositorioUsuario->alterarUsuario($usuario);
+        $resultado = $this->repositorioUsuario->atualizar($usuario);
         if ($resultado) {
             return new RespostaJson(200, json_encode($this->repositorioUsuario->buscarPorId($dados['id'])));
         }

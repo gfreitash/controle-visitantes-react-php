@@ -14,7 +14,7 @@ class RepositorioUsuarioPDO extends JoinableDataLayer implements RepositorioUsua
         parent::__construct("tb_usuario", ["funcao", "nome", "email", "senha"], "id", false);
     }
 
-    public function criarUsuario(Usuario $usuario): bool|int
+    public function criar(Usuario $usuario): bool|int
     {
         $arr = $usuario->paraArray();
         $arr['senha'] = $usuario->getSenha();
@@ -42,7 +42,7 @@ class RepositorioUsuarioPDO extends JoinableDataLayer implements RepositorioUsua
         return false;
     }
 
-    public function alterarUsuario(Usuario $usuario): bool
+    public function atualizar(Usuario $usuario): bool
     {
         $usr = $this->findById($usuario->getId());
         if (!$usr) {

@@ -33,7 +33,7 @@ class ControladorLogout extends ControladorRest
         }
 
         $usuario->setRefreshToken(null);
-        $this->repositorioUsuario->alterarUsuario($usuario);
+        $this->repositorioUsuario->atualizar($usuario);
         return new Response(200, ["Set-Cookie" => "jwt=; Max-Age=0"]);
     }
 

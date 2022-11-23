@@ -75,7 +75,7 @@ class ControladorVisitante extends ControladorRest
 
 
         $upload = $request->getUploadedFiles()['fotoInput'];
-        if ($upload->getSize() > 0) {
+        if ($upload?->getSize() > 0) {
             $uploadBinario = $upload?->getStream()->getContents() ?? null;
             $mime = $upload?->getClientMediaType() ?? null;
             $foto = Utils::converterBinarioParaBase64($uploadBinario, $mime);
@@ -131,7 +131,7 @@ class ControladorVisitante extends ControladorRest
         }
 
         $upload = $request->getUploadedFiles()['fotoInput'];
-        if ($upload->getSize() > 0) {
+        if ($upload?->getSize() > 0) {
             $uploadBinario = $upload->getStream()->getContents() ?? null;
             $mime = $upload->getClientMediaType() ?? null;
             $foto = Utils::converterBinarioParaBase64($uploadBinario, $mime);

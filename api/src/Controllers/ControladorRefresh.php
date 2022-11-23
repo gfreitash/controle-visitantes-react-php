@@ -30,7 +30,7 @@ class ControladorRefresh extends ControladorRest
         }
         if ($usuario->getRefreshToken() !== $refreshToken) {
             $usuario->setRefreshToken(null);
-            $this->repositorioUsuario->alterarUsuario($usuario);
+            $this->repositorioUsuario->atualizar($usuario);
 
             return new Response(403, ["Set-Cookie" => "jwt=; Max-Age=0"]);
         }

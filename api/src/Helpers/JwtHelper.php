@@ -72,7 +72,7 @@ class JwtHelper
         $accessToken = self::criarAccessToken($conteudoToken);
         $refreshToken = self::criarRefreshToken($conteudoToken);
         $usuario->setRefreshToken($refreshToken);
-        $repositorioUsuario->alterarUsuario($usuario);
+        $repositorioUsuario->atualizar($usuario);
 
         $dt = new \DateTime();
         $dt->setTimestamp(JwtHelper::decodeRefreshToken($refreshToken)->exp);
